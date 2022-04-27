@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../Magento/Backend/etc/system_file.xsd">
+    <system>
+		<!-- add new tab in system configuration section -->
+        <tab id="nofraud" translate="label" sortOrder="500">
+            <label>NoFraud</label>
+        </tab>
+		<!-- create section -->
+        <section id="nofraud" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Checkout</label>
+            <!-- Assign section to tab -->
+            <tab>nofraud</tab>
+            <resource>NoFraud_Checkout::custom</resource>
+            <!-- create group for fields in section -->
+            <group id="general" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General</label>
+				<field id="merchant" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant id</label>
+                </field>
+				<field id="api_source_js" translate="label" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>API souce js</label>
+				</field>
+            </group>
+        </section>
+		<section id="payment">
+                <group id="nofraud" translate="label" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>NoFraud Method</label>
+                    <field id="active" translate="label comment" sortOrder="10" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Enable</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Title</label>
+                    </field>
+                </group>
+        </section>
+    </system>
+</config>

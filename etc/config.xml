@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Store/etc/config.xsd">
+    <default>
+        <payment>
+            <nofraud>
+                <model>NoFraud\Checkout\Model\NoFraud</model>
+                <active>1</active>
+                <title>No fraud</title>
+                <order_status>pending_payment</order_status>
+            </nofraud>
+        </payment>
+    </default>
+</config>
