@@ -134,32 +134,25 @@ define([
         openPopup: function () { 
 			var cartData = customerData.get('cart');
 			var customer = customerData.get('customer');
-			if(cartData().quote_id){ 
-				// data: the context of the element that triggered the event
-	   
-				/* var sections = ['cart'];
-				customerData.invalidate(sections);
-				customerData.reload(sections, true); */
-				
-				window.nofraudcheckout_firstload += 1;
-				console.log('click button :' + window.nofraudcheckout_firstload); 
-				if(window.nofraudcheckout_firstload > 1){ 
-					$('[data-block="minicart"]').find('[data-role="dropdownDialog"]').dropdownDialog('close');
-					
-						var params = [];
-						params['data-nf-access-token'] = customer().fullname && customer().firstname ? window.nofraudcheckout_accesstokenforcustomer : window.nofraudcheckout_accesstokenfornotlogin;
-						params['data-nf-cart-id'] = cartData().quote_id;
-						params['data-nf-customer-is-logged-in'] = customer().fullname && customer().firstname ? 1 : 0;
-						params['data-nf-merchant-id'] = window.nofraudcheckout_merchant;
-						params['data-nf-store-url'] = BASE_URL;
-						
-						console.log(params);
-						
-						nfOpenCheckout(params);	
-				}
-				
+            var cartId   = customerData.get('nofrudcheckout')().quote_id;
+
+            if(cartId){
+
+            	window.nofraudcheckout_firstload += 1;
+
+		        if(window.nofraudcheckout_firstload > 1) {
+                    $('[data-block="minicart"]').find('[data-role="dropdownDialog"]').dropdownDialog('close');
+                    var params = [];
+                    params['data-nf-access-token'] = customer().fullname && customer().firstname ? window.nofraudcheckout_accesstokenforcustomer : window.nofraudcheckout_accesstokenfornotlogin;
+                    params['data-nf-cart-id'] = cartId;
+                    params['data-nf-customer-is-logged-in'] = customer().fullname && customer().firstname ? 1 : 0;
+                    params['data-nf-merchant-id'] = window.nofraudcheckout_merchant;
+                    params['data-nf-store-url'] = BASE_URL;
+                    console.log(params);
+                    nfOpenCheckout(params);
+                }
+                
 			}
-			
         },
 
         /**

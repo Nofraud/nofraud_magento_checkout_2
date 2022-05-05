@@ -2,7 +2,10 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Customer:etc/sections.xsd">
     <action name="quote_id/action/*">
-        <section name="quote_id"/>
+        <section name="nofrudcheckout"/>
         <section name="is_logged"/>
+    </action>
+    <action name="checkout/cart/add">
+        <section name="nofrudcheckout"/>
     </action>
 </config>
