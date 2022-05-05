@@ -33,7 +33,10 @@ class Custom extends \Magento\Framework\DataObject implements SectionSourceInter
         {
             $cartObj = $objectManager->get('\Magento\Checkout\Model\Cart');
             $quoteId = $cartObj->getQuote()->getId();
-            $cartId  = $quoteIdMask->load($quoteId,'quote_id')->getMaskedId();
+            //error_log("\n quoteId ".$quoteId,3,BP."/var/log/NFC.log");
+            //$cartId  = $quoteIdMask->load($quoteId,'quote_id')->getMaskedId();
+            //error_log("\n cartId ".$cartId,3,BP."/var/log/NFC.log");
+            $cartId = $quoteId;
         }
         else
         {

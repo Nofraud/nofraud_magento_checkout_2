@@ -8,4 +8,25 @@
     <action name="checkout/cart/add">
         <section name="nofrudcheckout"/>
     </action>
+    <action name="checkout/cart/delete">
+        <section name="nofrudcheckout"/>
+    </action>
+    <action name="checkout/sidebar/removeItem">
+        <section name="nofrudcheckout"/>
+    </action>
+    <action name="checkout/cart/configure">
+        <section name="nofrudcheckout"/>
+    </action>
+    <action name="rest/*/V1/guest-carts/*/shipping-information">
+        <section name="nofrudcheckout"/>
+    </action>
+    <action name="rest/*/V1/carts/*/shipping-information">
+        <section name="nofrudcheckout"/>
+    </action>
+    <action name="rest/*/V1/guest-carts/*/payment-information">
+        <section name="nofrudcheckout"/>
+    </action>
+    <action name="rest/*/V1/carts/*/payment-information">
+        <section name="nofrudcheckout"/>
+    </action>
 </config>
