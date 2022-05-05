@@ -138,9 +138,9 @@ define([
 
             if(cartId){
 
-            	window.nofraudcheckout_firstload += 1;
+            	//window.nofraudcheckout_firstload += 1;
 
-		        if(window.nofraudcheckout_firstload > 1) {
+		        //if(window.nofraudcheckout_firstload > 1) {
                     $('[data-block="minicart"]').find('[data-role="dropdownDialog"]').dropdownDialog('close');
                     var params = [];
                     params['data-nf-access-token'] = customer().fullname && customer().firstname ? window.nofraudcheckout_accesstokenforcustomer : window.nofraudcheckout_accesstokenfornotlogin;
@@ -150,7 +150,7 @@ define([
                     params['data-nf-store-url'] = BASE_URL;
                     console.log(params);
                     nfOpenCheckout(params);
-                }
+                //}
                 
 			}
         },
