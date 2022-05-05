@@ -13,8 +13,7 @@ use Magento\Framework\Escaper;
  */
 ?>
 <?php if ($block->isPossibleOnepageCheckout()): ?>
-    <button type="button"
-            data-role="proceed-to-checkout"
+    <button type="button" 
             title="<?= $escaper->escapeHtmlAttr(__('Proceed to Checkout')) ?>"
             class="customcheckout action primary checkout<?= ($block->isDisabled()) ? ' disabled' : '' ?>"
             <?php if ($block->isDisabled()): ?>
@@ -32,16 +31,19 @@ require([
 	$('.customcheckout').click(function(){
 		console.log('override button link');
 		var cartData = customerData.get('cart');
-		var params = [];
-		params['data-nf-access-token'] = cartData().is_logged ? window.nofraudcheckout_accesstokenforcustomer : window.nofraudcheckout_accesstokenfornotlogin;
-		params['data-nf-cart-id'] = cartData().data_id;
-		params['data-nf-customer-is-logged-in'] = cartData().is_logged ? 1 : 0;
-		params['data-nf-merchant-id'] = window.nofraudcheckout_merchant;
-		params['data-nf-store-url'] = BASE_URL;
-		
-		console.log(params);
-		
-		nfOpenCheckout(params);
+        var customer = customerData.get('customer');
+        var cartId   = customerData.get('nofrudcheckout')().quote_id;
+
+        if(cartId) {
+            var params = [];
+            params['data-nf-access-token'] = customer().fullname && customer().firstname ? window.nofraudcheckout_accesstokenforcustomer : window.nofraudcheckout_accesstokenfornotlogin;
+            params['data-nf-cart-id'] = cartId;
+            params['data-nf-customer-is-logged-in'] = customer().fullname && customer().firstname ? 1 : 0;
+            params['data-nf-merchant-id'] = window.nofraudcheckout_merchant;
+            params['data-nf-store-url'] = BASE_URL;
+            console.log(params);
+            nfOpenCheckout(params);
+        }
 	})
 })
 </script>
