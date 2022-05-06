@@ -4,6 +4,7 @@ use Magento\Checkout\Api\Data\PaymentDetailsInterface;
 use Magento\Checkout\Api\Data\ShippingInformationInterface;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 class ShippingInformationManagement extends \Magento\Checkout\Model\ShippingInformationManagement
 {
@@ -26,8 +27,8 @@ class ShippingInformationManagement extends \Magento\Checkout\Model\ShippingInfo
         $this->validateAddress($address);
 		
 		// custom code
-		$currentCurrency = $quote->getQuoteCurrencyCode();
-		$logger->info('currency : ' . $currentCurrency);
+		//$currentCurrency = $quote->getQuoteCurrencyCode();
+		//$logger->info('currency : ' . $currentCurrency);
 		
         if (!$address->getCustomerAddressId()) {
             $address->setCustomerAddressId(null);
@@ -54,11 +55,11 @@ class ShippingInformationManagement extends \Magento\Checkout\Model\ShippingInfo
 			$logger->info('set new ');
 			
 			$logger->info('before save : ' . $quote->getQuoteCurrencyCode());
-            //$this->quoteRepository->save($quote);
-			$quote->save();
-			$quote->setQuoteCurrencyCode($currentCurrency)->save();
-			$logger->info('new currency');
-			$logger->info($quote->getQuoteCurrencyCode());
+            $this->quoteRepository->save($quote);
+			//$quote->save();
+			//$quote->setQuoteCurrencyCode($currentCurrency)->save();
+			//$logger->info('new currency');
+			//$logger->info($quote->getQuoteCurrencyCode());
 			
         } catch (LocalizedException $e) {
             $this->logger->critical($e);
