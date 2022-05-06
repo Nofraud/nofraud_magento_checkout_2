@@ -4,6 +4,8 @@ use Magento\Checkout\Api\Data\PaymentDetailsInterface;
 use Magento\Checkout\Api\Data\ShippingInformationInterface;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 
 class ShippingInformationManagement extends \Magento\Checkout\Model\ShippingInformationManagement
@@ -14,21 +16,15 @@ class ShippingInformationManagement extends \Magento\Checkout\Model\ShippingInfo
         ShippingInformationInterface $addressInformation
     ): PaymentDetailsInterface {
         /** @var Quote $quote */
-		
-		$writer = new \Zend_Log_Writer_Stream(BP . '/var/log/customoverride.log');
-		$logger = new \Zend_Log();
-		$logger->addWriter($writer);
-		
-		
         $quote = $this->quoteRepository->getActive($cartId);
         $this->validateQuote($quote);
 
         $address = $addressInformation->getShippingAddress();
         $this->validateAddress($address);
 		
-		// custom code
 		//$currentCurrency = $quote->getQuoteCurrencyCode();
 		//$logger->info('currency : ' . $currentCurrency);
+		$currentCurrency = $quote->getQuoteCurrencyCode();
 		
         if (!$address->getCustomerAddressId()) {
             $address->setCustomerAddressId(null);
@@ -51,15 +47,21 @@ class ShippingInformationManagement extends \Magento\Checkout\Model\ShippingInfo
             $quote = $this->prepareShippingAssignment($quote, $address, $carrierCode . '_' . $methodCode);
 
             $quote->setIsMultiShipping(false);
+            $this->quoteRepository->save($quote);
 			
 			$logger->info('set new ');
 			
 			$logger->info('before save : ' . $quote->getQuoteCurrencyCode());
-            $this->quoteRepository->save($quote);
+      $this->quoteRepository->save($quote);
 			//$quote->save();
 			//$quote->setQuoteCurrencyCode($currentCurrency)->save();
 			//$logger->info('new currency');
 			//$logger->info($quote->getQuoteCurrencyCode());
+
+			$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+			$_quote = $objectManager->create('Magento\Quote\Model\Quote')->load($quote->getId());
+			$_quote->setQuoteCurrencyCode($currentCurrency)->save();
+
 			
         } catch (LocalizedException $e) {
             $this->logger->critical($e);
@@ -77,7 +79,6 @@ class ShippingInformationManagement extends \Magento\Checkout\Model\ShippingInfo
         }
 
         $shippingAddress = $quote->getShippingAddress();
-
         if (!$quote->getIsVirtual()
             && !$shippingAddress->getShippingRateByCode($shippingAddress->getShippingMethod())
         ) {
