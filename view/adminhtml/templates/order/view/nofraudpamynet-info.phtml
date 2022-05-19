@@ -1,0 +1,14 @@
+<?php $_order = $block->getOrder() ?>
+    <?php if( !empty($_order->getNofraudcheckout()) ){ ?>
+        <div class="no-fraud-payment-information">
+            <br/>
+            <?php
+                $paymentData = json_decode($_order->getNofraudcheckout(),true);
+                foreach ($paymentData as $key => $payment){ ?>
+                    <strong><?= __(ucwords($key)); ?>:</strong>
+                    <span><?= __(ucwords($paymentData[$key])); ?></span>
+                    <br/>
+            <?php }
+            ?>
+        </div>
+    <?php } ?>

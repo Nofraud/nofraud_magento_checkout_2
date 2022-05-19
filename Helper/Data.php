@@ -1,5 +1,4 @@
 <?php
-
 namespace NoFraud\Checkout\Helper;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper {
@@ -15,6 +14,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         parent::__construct($context);
     }
 	
+    /**
+    * get Merchant Id
+    */
 	public function getMerchantId()
     {
         return $this->scopeConfig->getValue(
@@ -22,7 +24,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    
 	public function getAccessTokenNotLogin()
     {
         return $this->scopeConfig->getValue(
@@ -31,6 +33,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         );
     }
 	
+    /**
+    * get API Source JS URL
+    */
 	public function getApiSourceJs()
     {
         return $this->scopeConfig->getValue(
@@ -39,4 +44,25 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         );
     }
 	
+    /**
+    * get Refund APi URL
+    */
+    public function getRefundApiUrl()
+    {
+        return $this->scopeConfig->getValue(
+            'nofraud/general/api_refund_url',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+    * get Refund APi Key
+    */
+    public function getRefundApiKey()
+    {
+        return $this->scopeConfig->getValue(
+            'nofraud/general/api_key',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
 }
