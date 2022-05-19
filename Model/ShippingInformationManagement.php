@@ -4,6 +4,8 @@ use Magento\Checkout\Api\Data\PaymentDetailsInterface;
 use Magento\Checkout\Api\Data\ShippingInformationInterface;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 
 class ShippingInformationManagement extends \Magento\Checkout\Model\ShippingInformationManagement
@@ -56,10 +58,10 @@ class ShippingInformationManagement extends \Magento\Checkout\Model\ShippingInfo
 
             $logger->info('before save : ' . $quote->getQuoteCurrencyCode());
             $this->quoteRepository->save($quote);
-            //$quote->save();
-            //$quote->setQuoteCurrencyCode($currentCurrency)->save();
-            //$logger->info('new currency');
-            //$logger->info($quote->getQuoteCurrencyCode());
+
+			$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+			$_quote = $objectManager->create('Magento\Quote\Model\Quote')->load($quote->getId());
+			$_quote->setQuoteCurrencyCode($currentCurrency)->save();
 
         } catch (LocalizedException $e) {
             $this->logger->critical($e);
