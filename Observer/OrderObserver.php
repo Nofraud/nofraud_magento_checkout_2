@@ -85,7 +85,7 @@ class OrderObserver implements ObserverInterface
             $order = $this->_orderRepository->get($orderId);
 			
 			$logger->info('payment method : ' . $order->getPayment()->getMethod());
-            if ( $order && $order->getPayment()->getMethod() == 'checkmo' )
+            if ( $order && $order->getPayment()->getMethod() == 'nofraud' )
             {
 				$logger->info('start automatic create invoice : ');
                 $invoices = $this->_invoiceCollectionFactory->create()
