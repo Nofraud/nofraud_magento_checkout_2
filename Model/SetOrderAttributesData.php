@@ -31,7 +31,10 @@ class SetOrderAttributesData implements SetOrderAttributes
 		$order 		= $this->order->load($data["order_id"]);
         $this->appEmulation->startEnvironmentEmulation($storeId, \Magento\Framework\App\Area::AREA_FRONTEND, true);
 		try{
+            $logger->info(" order state ".$order->getState());
 			$order->setData('nofraudcheckout',json_encode($data));
+            $order->setStatus($order->getState());
+            $order->setData('status',$order->getState());
 			$order->save();
 			$response = [
                 [

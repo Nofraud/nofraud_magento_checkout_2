@@ -39,7 +39,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
 	public function getApiSourceJs()
     {
         return $this->scopeConfig->getValue(
-            'nofraud/general/api_source_js',
+            'nofraud/advance/api_source_js',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
@@ -50,7 +50,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     public function getRefundApiUrl()
     {
         return $this->scopeConfig->getValue(
-            'nofraud/general/api_refund_url',
+            'nofraud/advance/api_refund_url',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }

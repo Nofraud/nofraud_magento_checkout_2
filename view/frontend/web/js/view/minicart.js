@@ -135,6 +135,7 @@ define([
 			var cartData = customerData.get('cart');
 			var customer = customerData.get('customer');
             var cartId   = customerData.get('nofrudcheckout')().quote_id;
+           
 
             if(cartId){
 
@@ -223,6 +224,14 @@ define([
             var items = this.getCartParamUnsanitizedHtml('items') || [];
 
             return parseInt(items.length, 10);
+        },
+
+        /**
+        * Returns if NoFraud activate or deactivate
+        * @returns {Number}
+        */
+        isNoFraudEnabled: function () {
+            return customerData.get('nofrudcheckout')().isNofraudenabled;
         }
     });
 });
