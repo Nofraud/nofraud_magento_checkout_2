@@ -231,6 +231,7 @@ define([
         * @returns {Number}
         */
         isNoFraudEnabled: function () {
+            console.log(" isNoFraudEnabled: "+customerData.get('nofrudcheckout')().isNofraudenabled);
             return customerData.get('nofrudcheckout')().isNofraudenabled;
         }
     });
