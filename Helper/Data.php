@@ -4,8 +4,22 @@ namespace NoFraud\Checkout\Helper;
 class Data extends \Magento\Framework\App\Helper\AbstractHelper {
 
     protected $_config;
+
     protected $_storeManager;
-    
+
+    const PROD_API_SOURCE_JS = "https://cdn-checkout.nofraud.com/scripts/nf-src-magento.js";
+
+    const STAG_API_SOURCE_JS = "https://cdn-checkout-qe2.nofraud-test.com/scripts/nf-src-magento.js";
+
+    const DEV_API_SOURCE_JS = "https://dynamic-checkout-test.nofraud-test.com/latest/scripts/nf-src-magento.js";
+
+    const PROD_REFUND_API_URL = "https://dynamic-api-checkout.nofraud.com/api/v1/hooks/refund/";
+
+    const STAG_REFUND_API_URL = "https://dynamic-checkout-api-staging2.nofraud-test.com/api/v1/hooks/refund/";
+
+    const DEV_REFUND_API_URL = "https://dynamic-checkout-api-staging2.nofraud-test.com/api/v1/hooks/refund/";
+
+
     public function __construct(
 		\Magento\Framework\App\Helper\Context $context,
 		\Magento\Store\Model\StoreManagerInterface $storeManager
@@ -13,7 +27,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         $this->_storeManager = $storeManager;
         parent::__construct($context);
     }
-	
+
+    /**
+     * get Nofruad checkout mode
+     */
+    public function getNofraudAdvanceListMode()
+    {
+        return $this->scopeConfig->getValue(
+            'nofraud/advance/list_mode',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
     /**
     * get Merchant Id
     */
@@ -38,10 +63,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     */
 	public function getApiSourceJs()
     {
-        return $this->scopeConfig->getValue(
-            'nofraud/general/api_source_js',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
+        $checkoutMode = $this->getNofraudAdvanceListMode();
+
+        if( strcmp($checkoutMode,"prod") === 0 ){
+
+            return self::PROD_API_SOURCE_JS;
+
+        }elseif( strcmp($checkoutMode,"stag") === 0 ){
+
+            return self::STAG_API_SOURCE_JS;
+
+        }elseif( strcmp($checkoutMode,"dev") === 0 ) {
+
+            return self::DEV_API_SOURCE_JS;
+
+        }
     }
 	
     /**
@@ -49,10 +85,24 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     */
     public function getRefundApiUrl()
     {
-        return $this->scopeConfig->getValue(
-            'nofraud/general/api_refund_url',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
+        $checkoutMode = $this->getNofraudAdvanceListMode();
+
+        $merchantId   = $this->getMerchantId();
+
+        if( strcmp($checkoutMode,"prod") === 0 ){
+
+            return self::PROD_REFUND_API_URL.$merchantId;
+
+        }elseif( strcmp($checkoutMode,"stag") === 0 ){
+
+            return self::STAG_REFUND_API_URL.$merchantId;
+
+        }elseif( strcmp($checkoutMode,"dev") === 0 ) {
+
+            return self::DEV_REFUND_API_URL.$merchantId;
+
+        }
+
     }
 
     /**

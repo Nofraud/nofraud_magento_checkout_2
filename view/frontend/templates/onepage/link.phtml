@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
@@ -11,39 +12,50 @@ use Magento\Framework\Escaper;
  * @var Link $block
  * @var Escaper $escaper
  */
+$viewModel = $block->getData('nofraudviewmodel');
+$isNofraudenabled = (int) $viewModel->getConfig();
 ?>
-<?php if ($block->isPossibleOnepageCheckout()): ?>
-    <button type="button" 
-            title="<?= $escaper->escapeHtmlAttr(__('Proceed to Checkout')) ?>"
-            class="customcheckout action primary checkout<?= ($block->isDisabled()) ? ' disabled' : '' ?>"
-            <?php if ($block->isDisabled()): ?>
-                disabled="disabled"
-            <?php endif; ?>>
-        <span><?= $escaper->escapeHtml(__('Proceed to Checkout')) ?></span>
-    </button>
-<?php endif?>
+<?php if ($isNofraudenabled) : ?>
+    <?php if ($block->isPossibleOnepageCheckout()) : ?>
+        <button type="button" title="<?= $escaper->escapeHtmlAttr(__('Proceed to Checkout')) ?>" class="customcheckout action primary checkout<?= ($block->isDisabled()) ? ' disabled' : '' ?>" <?php if ($block->isDisabled()) : ?> disabled="disabled" <?php endif; ?>>
+            <span><?= $escaper->escapeHtml(__('Proceed to Checkout')) ?></span>
+        </button>
+    <?php endif ?>
+<?php else : ?>
+    <?php if ($block->isPossibleOnepageCheckout()) : ?>
+        <button type="button" data-role="proceed-to-checkout" title="<?= $escaper->escapeHtmlAttr(__('Proceed to Checkout')) ?>" data-mage-init='{
+                    "Magento_Checkout/js/proceed-to-checkout":{
+                        "checkoutUrl":"<?= $escaper->escapeJs($block->getCheckoutUrl()) ?>"
+                    }
+                }' class="action primary checkout<?= ($block->isDisabled()) ? ' disabled' : '' ?>" <?php if ($block->isDisabled()) : ?> disabled="disabled" <?php endif; ?>>
+            <span><?= $escaper->escapeHtml(__('Proceed to Checkout')) ?></span>
+        </button>
+    <?php endif ?>
+<?php endif ?>
 
-<script>        
-require([
-	'jquery',
-	'Magento_Customer/js/customer-data'
-], function($, customerData, customer) {
-	$('.customcheckout').click(function(){
-		console.log('override button link');
-		var cartData = customerData.get('cart');
-        var customer = customerData.get('customer');
-        var cartId   = customerData.get('nofrudcheckout')().quote_id;
+<?php if ($isNofraudenabled) : ?>
+    <script>
+        require([
+            'jquery',
+            'Magento_Customer/js/customer-data'
+        ], function($, customerData, customer) {
+            $('.customcheckout').click(function() {
+                console.log('override button link');
+                var cartData = customerData.get('cart');
+                var customer = customerData.get('customer');
+                var cartId = customerData.get('nofrudcheckout')().quote_id;
 
-        if(cartId) {
-            var params = [];
-            params['data-nf-access-token'] = customer().fullname && customer().firstname ? window.nofraudcheckout_accesstokenforcustomer : window.nofraudcheckout_accesstokenfornotlogin;
-            params['data-nf-cart-id'] = cartId;
-            params['data-nf-customer-is-logged-in'] = customer().fullname && customer().firstname ? 1 : 0;
-            params['data-nf-merchant-id'] = window.nofraudcheckout_merchant;
-            params['data-nf-store-url'] = BASE_URL;
-            console.log(params);
-            nfOpenCheckout(params);
-        }
-	})
-})
-</script>
+                if (cartId) {
+                    var params = [];
+                    params['data-nf-access-token'] = customer().fullname && customer().firstname ? window.nofraudcheckout_accesstokenforcustomer : window.nofraudcheckout_accesstokenfornotlogin;
+                    params['data-nf-cart-id'] = cartId;
+                    params['data-nf-customer-is-logged-in'] = customer().fullname && customer().firstname ? 1 : 0;
+                    params['data-nf-merchant-id'] = window.nofraudcheckout_merchant;
+                    params['data-nf-store-url'] = BASE_URL;
+                    console.log(params);
+                    nfOpenCheckout(params);
+                }
+            })
+        })
+    </script>
+<?php endif ?>
