@@ -19,6 +19,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
 
     const DEV_REFUND_API_URL = "https://dynamic-checkout-api-staging2.nofraud-test.com/api/v1/hooks/refund/";
 
+    const PROD_PORTAL_BASE_URL = "https://portal-qe2.nofraud-test.com";
+
+    const STAG_PORTAL_BASE_URL = " https://portal-qe2.nofraud-test.com";
+
+    const DEV_PORTAL_BASE_URL = "https://portal.nofraud.com";
 
     public function __construct(
 		\Magento\Framework\App\Helper\Context $context,
@@ -100,6 +105,31 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         }elseif( strcmp($checkoutMode,"dev") === 0 ) {
 
             return self::DEV_REFUND_API_URL.$merchantId;
+
+        }
+
+    }
+
+    /**
+     * get Cancel APi URL
+     */
+    public function getCancelTransactionApiUrl()
+    {
+        $checkoutMode = $this->getNofraudAdvanceListMode();
+
+        $merchantId   = $this->getMerchantId();
+
+        if( strcmp($checkoutMode,"prod") === 0 ){
+
+            return self::PROD_PORTAL_BASE_URL.$merchantId;
+
+        }elseif( strcmp($checkoutMode,"stag") === 0 ){
+
+            return self::STAG_PORTAL_BASE_URL.$merchantId;
+
+        }elseif( strcmp($checkoutMode,"dev") === 0 ) {
+
+            return self::DEV_PORTAL_BASE_URL.$merchantId;
 
         }
 

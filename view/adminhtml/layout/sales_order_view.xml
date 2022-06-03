@@ -8,7 +8,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="payment_additional_info">
-            <block class="Magento\Sales\Block\Adminhtml\Order\View" name="nofraud.payment" template="NoFraud_Checkout::order/view/nofraudpamynet-info.phtml" />
+            <block class="Magento\Sales\Block\Adminhtml\Order\View" name="nofraud.payment" template="NoFraud_Checkout::order/view/nofraudpamynet-info.phtml"/>
         </referenceContainer>
     </body>
 </page>
