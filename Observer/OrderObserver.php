@@ -4,9 +4,13 @@ namespace NoFraud\Checkout\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
 
+use Magento\Framework\Event\ManagerInterface as EventManager;
+
 class OrderObserver implements ObserverInterface
 {
     const XML_PATH_ENABLED = 'nofraud/general/enabled';
+
+    private $_eventManager;
 
     protected $scopeConfig;
 
@@ -43,6 +47,7 @@ class OrderObserver implements ObserverInterface
      * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
      */
     public function __construct(
+        EventManager $eventManager,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Sales\Model\ResourceModel\Order\Invoice\CollectionFactory $invoiceCollectionFactory,
         \Magento\Sales\Model\Service\InvoiceService $invoiceService,
@@ -50,6 +55,7 @@ class OrderObserver implements ObserverInterface
         \Magento\Sales\Api\InvoiceRepositoryInterface $invoiceRepository,
         \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
     ) {
+        $this->_eventManager = $eventManager;
         $this->scopeConfig = $scopeConfig;
         $this->_invoiceCollectionFactory = $invoiceCollectionFactory;
         $this->_invoiceService = $invoiceService;
@@ -76,7 +82,15 @@ class OrderObserver implements ObserverInterface
             $logger = new \Zend_Log();
             $logger->addWriter($writer);
 
-            $orderId = $observer->getEvent()->getOrder()->getId();
+            $order = $observer->getEvent()->getOrder();
+            $orderId = $order->getId();
+
+            $this->_eventManager->dispatch(
+                'nofraud_order_event_observer',
+                [
+                    'order' => $order
+                ]
+            );
 
             $logger->info('observer for order : ' . $orderId);
             $this->createInvoice($orderId);

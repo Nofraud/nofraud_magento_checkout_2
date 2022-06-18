@@ -3,7 +3,7 @@
 
 $creditMemo = $block->getCurrentCreditmemo();
 if($creditMemo && $creditMemo->getOrder() && $creditMemo->getOrder()->getId()) {
-	$tranId = $block->getTransactionId($creditMemo->getOrder());
+	$tranId = $block->getRefundTransactionId($creditMemo->getOrder());
 	if($tranId) {
 ?>
 <button id="id_<?= rand(); ?>" title="<?= __("Refund NoFraud") ?>" type="button" class="nofraudTrigger action-default scalable save submit-button primary nofraud">

@@ -26,14 +26,15 @@ class RefundButton extends \Magento\Backend\Block\Template
     /**
     * get payment Transaction Id
     */
-    public function getTransactionId($order) {
+    public function getRefundTransactionId($order) {
         $nofraudcheckout = $order->getData("nofraudcheckout");
         if(!$nofraudcheckout) {
             return false;
         }
         $nofraudcheckoutArray = json_decode($nofraudcheckout, true);
         if(isset($nofraudcheckoutArray["transaction_id"])) {
-            return $nofraudcheckoutArray["transaction_id"];
+            $transaction_id = explode("#",$nofraudcheckoutArray["transaction_id"]);
+            return $transaction_id[0] ?? "";
         }
         return false;
     }
