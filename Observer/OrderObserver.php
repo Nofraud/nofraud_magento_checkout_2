@@ -86,7 +86,7 @@ class OrderObserver implements ObserverInterface
             $orderId = $order->getId();
 
             $this->_eventManager->dispatch(
-                'nofraud_order_event_observer',
+                'nofraud_order_place_after',
                 [
                     'order' => $order
                 ]
