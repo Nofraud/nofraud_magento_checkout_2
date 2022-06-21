@@ -13,4 +13,7 @@
     <event name="sales_order_save_after">
         <observer name="nofraud_sales_order" instance="NoFraud\Checkout\Observer\StatusChangeNofraudObserver"/>
     </event>
+    <event name="admin_system_config_changed_section_nofraud">
+        <observer name="nofraud_admin_system_config_changed_section_nofraud" instance="NoFraud\Checkout\Observer\ConfigChangeObserver"/>
+    </event>
 </config>
