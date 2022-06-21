@@ -34,7 +34,6 @@
                     <label>NF Token</label>
                     <validate>required-entry</validate>
                     <comment><![CDATA[Don't have an account? Please <a href="https://portal.nofraud.com" target="_blank"> click here</a> to create one. You will find it from nofraud portal through your account.]]></comment>
-                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 </field>
             </group>
             <group id="advance" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
