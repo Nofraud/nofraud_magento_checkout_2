@@ -47,8 +47,9 @@
         <each args="getRegion('extraInfo')" render=""></each>
 
         <div class="actions" if="getCartParam('possible_onepage_checkout')">
-            <div class="primary">
-				 <button
+	    <!-- ko if: (isNoFraudEnabled()) -->
+            	<div class="primary">
+			<button
                         id="custom_button"
                         type="button"
                         class="action primary checkout"
@@ -57,13 +58,31 @@
                             attr: {
                                 title: $t('Proceed to Checkout')
                             },
-                            click: openPopup() 
+                            click: openPopup 
                         "
                         translate="'Proceed to Checkout'">
-                </button>
-				
-                <div data-bind="html: getCartParamUnsanitizedHtml('extra_actions')"></div>
-            </div>
+                	</button>
+	        	<div data-bind="html: getCartParamUnsanitizedHtml('extra_actions')"></div>
+            	</div>
+	     <!--/ko-->
+	     <!-- ko ifnot: (isNoFraudEnabled()) -->
+		<div class="primary">	
+                      <button	
+                        id="top-cart-btn-checkout"	
+                        type="button"	
+                        class="action primary checkout"	
+                        data-action="close"	
+                        data-bind="	
+                            attr: {	
+                                title: $t('Proceed to Checkout')	
+                            },	
+                            click: closeMinicart()	
+                        "	
+                        translate="'Proceed to Checkout'">	
+                	</button>	
+                	<div data-bind="html: getCartParamUnsanitizedHtml('extra_actions')"></div>	
+            	</div>
+	     <!--/ko-->
         </div>
     </if>
 
