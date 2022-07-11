@@ -1,0 +1,49 @@
+<?php
+/* $block NoFraud\Checkout\Block\Adminhtml\Order\Creditmemo\RefundButton */
+
+$creditMemo = $block->getCurrentCreditmemo();
+if($creditMemo && $creditMemo->getOrder() && $creditMemo->getOrder()->getId()) {
+	$tranId = $block->getRefundTransactionId($creditMemo->getOrder());
+	if($tranId) {
+?>
+<button id="id_<?= rand(); ?>" title="<?= __("Refund NoFraud") ?>" type="button" class="nofraudTrigger action-default scalable save submit-button primary nofraud">
+    <span><?= __("Refund NoFraud") ?></span>
+</button>
+<script type="text/javascript">
+require([
+	'jquery',
+	'Magento_Ui/js/modal/alert'
+], function($, alert) {
+	var ajaxUrl = '<?= $this->getUrl('nofraud/order/refundOnline', ["order_id" => $creditMemo->getOrder()->getId(), "authId" => $tranId]); ?>';
+	jQuery("button.nofraudTrigger").unbind("click");
+
+	jQuery("button.nofraudTrigger").click(function(event) {
+		event.preventDefault();
+		var param = jQuery("form#edit_form").serialize();
+		jQuery.ajax({
+	        showLoader: true,
+	        url: ajaxUrl,
+	        data: param,
+	        type: "POST",
+	        dataType: 'json'
+	    }).done(function (data) {
+	    	if(data && data.success == true) {
+	    		var creditMemoOffline = jQuery('#creditmemo_do_offline');
+			    if (creditMemoOffline.length) {
+			        creditMemoOffline.prop('value', 1);
+			    }
+			    jQuery('#edit_form').triggerHandler('save');
+	    	} else {
+	    		alert({
+			        title: "",
+			        content: data.message,
+			        actions: {
+			            always: function(){}
+			        }
+			    });
+	    	}
+	    });
+    });
+});
+</script>
+<?php } } ?>

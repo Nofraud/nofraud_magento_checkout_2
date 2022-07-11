@@ -1,11 +1,13 @@
 <?xml version="1.0"?>
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
-
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"> 
     <body>
 		<referenceBlock name="checkout.cart.methods.onepage.bottom">
 		   <action method="setTemplate">
 			   <argument name="template" xsi:type="string">NoFraud_Checkout::onepage/link.phtml</argument>
 		   </action>
+		   <arguments>
+				<argument name="nofraudviewmodel" xsi:type="object">NoFraud\Checkout\ViewModel\NoFraud</argument>
+	       </arguments>
 		</referenceBlock>
 	</body>
 </page>

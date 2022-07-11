@@ -9,5 +9,13 @@
                 <order_status>pending_payment</order_status>
             </nofraud>
         </payment>
+        <nofraud>
+            <general>
+                <merchant>megento_merchant_1</merchant>
+                <api_source_js>https://dynamic-checkout-test.nofraud-test.com/latest/scripts/nf-src-magento.js</api_source_js>
+                <api_refund_url></api_refund_url>
+                <api_key></api_key>
+            </general>
+        </nofraud>
     </default>
 </config>

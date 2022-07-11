@@ -4,31 +4,34 @@ use Magento\Checkout\Api\Data\PaymentDetailsInterface;
 use Magento\Checkout\Api\Data\ShippingInformationInterface;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 class ShippingInformationManagement extends \Magento\Checkout\Model\ShippingInformationManagement
 {
-	
+
     public function saveAddressInformation(
         $cartId,
         ShippingInformationInterface $addressInformation
     ): PaymentDetailsInterface {
         /** @var Quote $quote */
-		
-		$writer = new \Zend_Log_Writer_Stream(BP . '/var/log/customoverride.log');
-		$logger = new \Zend_Log();
-		$logger->addWriter($writer);
-		
-		
+
+        $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/customoverride.log');
+        $logger = new \Zend_Log();
+        $logger->addWriter($writer);
+
+
         $quote = $this->quoteRepository->getActive($cartId);
         $this->validateQuote($quote);
 
         $address = $addressInformation->getShippingAddress();
         $this->validateAddress($address);
-		
-		// custom code
-		$currentCurrency = $quote->getQuoteCurrencyCode();
-		$logger->info('currency : ' . $currentCurrency);
-		
+
+        // custom code
+        $currentCurrency = $quote->getQuoteCurrencyCode();
+        $logger->info('currency : ' . $currentCurrency);
+
         if (!$address->getCustomerAddressId()) {
             $address->setCustomerAddressId(null);
         }
@@ -50,16 +53,16 @@ class ShippingInformationManagement extends \Magento\Checkout\Model\ShippingInfo
             $quote = $this->prepareShippingAssignment($quote, $address, $carrierCode . '_' . $methodCode);
 
             $quote->setIsMultiShipping(false);
-			
-			$logger->info('set new ');
-			
-			$logger->info('before save : ' . $quote->getQuoteCurrencyCode());
-            //$this->quoteRepository->save($quote);
-			$quote->save();
-			$quote->setQuoteCurrencyCode($currentCurrency)->save();
-			$logger->info('new currency');
-			$logger->info($quote->getQuoteCurrencyCode());
-			
+
+            $logger->info('set new ');
+
+            $logger->info('before save : ' . $quote->getQuoteCurrencyCode());
+            $this->quoteRepository->save($quote);
+
+			$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+			$_quote = $objectManager->create('Magento\Quote\Model\Quote')->load($quote->getId());
+			$_quote->setQuoteCurrencyCode($currentCurrency)->save();
+
         } catch (LocalizedException $e) {
             $this->logger->critical($e);
             throw new InputException(
@@ -92,18 +95,18 @@ class ShippingInformationManagement extends \Magento\Checkout\Model\ShippingInfo
         $paymentDetails = $this->paymentDetailsFactory->create();
         $paymentDetails->setPaymentMethods($this->paymentMethodManagement->getList($cartId));
         $paymentDetails->setTotals($this->cartTotalsRepository->get($cartId));
-		
+
         return $paymentDetails;
     }
-	
-	private function validateAddress(?AddressInterface $address): void
+
+    private function validateAddress(?AddressInterface $address): void
     {
         if (!$address || !$address->getCountryId()) {
             throw new StateException(__('The shipping address is missing. Set the address and try again.'));
         }
     }
-	
-	 private function prepareShippingAssignment(CartInterface $quote, AddressInterface $address, $method): CartInterface
+
+    private function prepareShippingAssignment(CartInterface $quote, AddressInterface $address, $method): CartInterface
     {
         $cartExtension = $quote->getExtensionAttributes();
         if ($cartExtension === null) {
