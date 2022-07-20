@@ -40,11 +40,17 @@ class OrderObserver implements ObserverInterface
     protected $_orderRepository;
 
     /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $_checkoutSession;
+
+    /**
      * @param \Magento\Sales\Model\ResourceModel\Order\Invoice\CollectionFactory $invoiceCollectionFactory
      * @param \Magento\Sales\Model\Service\InvoiceService $invoiceService
      * @param \Magento\Framework\DB\TransactionFactory $transactionFactory
      * @param \Magento\Sales\Api\InvoiceRepositoryInterface $invoiceRepository
      * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
+     * @param \Magento\Checkout\Model\Session $checkoutSession
      */
     public function __construct(
         EventManager $eventManager,
@@ -53,7 +59,8 @@ class OrderObserver implements ObserverInterface
         \Magento\Sales\Model\Service\InvoiceService $invoiceService,
         \Magento\Framework\DB\TransactionFactory $transactionFactory,
         \Magento\Sales\Api\InvoiceRepositoryInterface $invoiceRepository,
-        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
+        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
+        \Magento\Checkout\Model\Session $checkoutSession
     ) {
         $this->_eventManager = $eventManager;
         $this->scopeConfig = $scopeConfig;
@@ -62,6 +69,7 @@ class OrderObserver implements ObserverInterface
         $this->_transactionFactory = $transactionFactory;
         $this->_invoiceRepository = $invoiceRepository;
         $this->_orderRepository = $orderRepository;
+        $this->_checkoutSession = $checkoutSession;
     }
 
     public function getConfig($config_path)
@@ -94,14 +102,12 @@ class OrderObserver implements ObserverInterface
 
             $logger->info('observer for order : ' . $orderId);
             $this->createInvoice($orderId);
-            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $checkoutSession = $objectManager->get('Magento\Checkout\Model\Session');
-            $checkoutSession->clearQuote()->clearStorage();
-            $checkoutSession->clearQuote();
-            $checkoutSession->clearStorage();
-            $checkoutSession->clearHelperData();
-            $checkoutSession->resetCheckout();
-            $checkoutSession->restoreQuote();
+            $this->_checkoutSession->clearQuote()->clearStorage();
+            $this->_checkoutSession->clearQuote();
+            $this->_checkoutSession->clearStorage();
+            $this->_checkoutSession->clearHelperData();
+            $this->_checkoutSession->resetCheckout();
+            $this->_checkoutSession->restoreQuote();
         }
     }
 
