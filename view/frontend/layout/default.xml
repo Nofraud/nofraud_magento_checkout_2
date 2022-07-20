@@ -2,7 +2,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
     <body>
 		<referenceContainer name="after.body.start">
-			<block class="Magento\Framework\View\Element\Template" cacheable="false" name="customcomponents" as="customcomponents" template="NoFraud_Checkout::js/customcomponents.phtml" ifconfig="nofraud/general/enabled" />
+			<block class="NoFraud\Checkout\Block\Customcomponents" cacheable="false" name="customcomponents" as="customcomponents" template="NoFraud_Checkout::js/customcomponents.phtml" ifconfig="nofraud/general/enabled" />
 		</referenceContainer>
 	</body>
 </page>
