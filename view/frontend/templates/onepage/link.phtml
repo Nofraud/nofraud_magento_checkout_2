@@ -1,17 +1,4 @@
 <?php
-
-/**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
-
-use Magento\Checkout\Block\Onepage\Link;
-use Magento\Framework\Escaper;
-
-/**
- * @var Link $block
- * @var Escaper $escaper
- */
 $viewModel = $block->getData('nofraudviewmodel');
 $isNofraudenabled = (int) $viewModel->getConfig();
 ?>
