@@ -102,8 +102,6 @@ class OrderObserver implements ObserverInterface
 
             $logger->info('observer for order : ' . $orderId);
             $this->createInvoice($orderId);
-           // $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-           // $checkoutSession = $objectManager->get('Magento\Checkout\Model\Session');
             $this->_checkoutSession->clearQuote()->clearStorage();
             $this->_checkoutSession->clearQuote();
             $this->_checkoutSession->clearStorage();
