@@ -10,6 +10,8 @@ class OrderObserver implements ObserverInterface
 {
     const XML_PATH_ENABLED = 'nofraud/general/enabled';
 
+    const XML_PATH_PAYMENT_ACTION = 'nofraud/advance/payment_action';
+
     private $_eventManager;
 
     protected $scopeConfig;
@@ -101,7 +103,12 @@ class OrderObserver implements ObserverInterface
             );
 
             $logger->info('observer for order : ' . $orderId);
-            $this->createInvoice($orderId);
+
+            $paymentActions = $this->getConfig(self::XML_PATH_PAYMENT_ACTION);
+            if($paymentActions == "authorize_capture"){
+                $this->createInvoice($orderId);
+            }
+            
             $this->_checkoutSession->clearQuote()->clearStorage();
             $this->_checkoutSession->clearQuote();
             $this->_checkoutSession->clearStorage();
