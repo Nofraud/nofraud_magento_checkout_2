@@ -19,6 +19,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
 
     const DEV_REFUND_API_URL = "https://dynamic-checkout-api-staging2.nofraud-test.com/api/v1/hooks/refund/";
 
+    const PROD_CAPTURE_API_URL = "https://dynamic-api-checkout.nofraud.com/api/v1/hooks/capture/";
+
+    const STAG_CAPTURE_API_URL = "https://dynamic-checkout-api-staging2.nofraud-test.com/api/v1/hooks/capture/";
+
+    const DEV_CAPTURE_API_URL = "https://dynamic-checkout-api-staging2.nofraud-test.com/api/v1/hooks/capture/";
+
     const PROD_PORTAL_BASE_URL = "https://portal.nofraud.com/api/v1/transaction-update/cancel-transaction";
 
     const STAG_PORTAL_BASE_URL = " https://portal-qe2.nofraud-test.com/api/v1/transaction-update/cancel-transaction";
@@ -83,6 +89,31 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
             return self::DEV_API_SOURCE_JS;
 
         }
+    }
+
+    /**
+     * Get Capture APi URL
+     */
+    public function getCaptureTransactionApiUrl()
+    {
+        $checkoutMode = $this->getNofraudAdvanceListMode();
+
+        $merchantId   = $this->getMerchantId();  
+
+        if( strcmp($checkoutMode,"prod") === 0 ){
+
+            return self::PROD_CAPTURE_API_URL.$merchantId;
+
+        }elseif( strcmp($checkoutMode,"stag") === 0 ){
+
+            return self::STAG_CAPTURE_API_URL.$merchantId;
+
+        }elseif( strcmp($checkoutMode,"dev") === 0 ) {
+
+            return self::DEV_CAPTURE_API_URL.$merchantId;
+
+        }
+
     }
 	
     /**
@@ -154,6 +185,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     {
         return $this->scopeConfig->getValue(
             'nofraud/general/nf_token',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * get Capture APi Key
+     */
+    public function getCaptureApiKey()
+    {
+        return $this->scopeConfig->getValue(
+            'nofraud/general/api_key',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
