@@ -15,6 +15,10 @@
             <!-- create group for fields in section -->
             <group id="general" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>General Options</label>
+                <group id="version" translate="label" type="text" 
+                    sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>NoFraud\Checkout\Block\Adminhtml\System\Config\Fieldset\Version</frontend_model>
+                </group>
                 <field id="enabled" translate="label" type="select" 
                     sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable NoFraud Checkout</label>
@@ -35,8 +39,56 @@
                     <validate>required-entry</validate>
                     <comment><![CDATA[Don't have an account? Please <a href="https://portal.nofraud.com" target="_blank"> click here</a> to create one. You will find it from nofraud portal through your account.]]></comment>
                 </field>
+                <field id="cron_expression" translate="Review Fraud Status Cron" type="text" sortOrder="50" showInDefault="1">
+                    <label>Review Fraud Status Cron</label>
+                    <validate>required-entry</validate>
+                    <comment><![CDATA[
+                    Enter comma separated cron expressions time to check the Review Fraud Status Cron.<br/>
+<pre>
+* * * * *
+| | | | |
+| | | | +---- Day of the Week   (range: 0-6, 1 standing for Monday)
+| | | +------ Month of the Year (range: 1-12)
+| | +-------- Day of the Month  (range: 1-31)
+| +---------- Hour              (range: 0-23)
++------------ Minute            (range: 0-59)
+Example: 0 0 * * * Daily at midnight
+</pre>
+                            ]]></comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
             </group>
-            <group id="advance" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="order_statuses" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Order Statuses</label>
+                <comment>The following statuses will be applied to orders after checkout, according to the decision returned from NoFraud ("pass", "review", or "fail"). If no custom status is selected, NoFraud will still provide a transaction report but the order's status will not be changed.</comment>
+                <field id="pass" translate="label" type="select" 
+                    sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Pass</label>
+                    <comment></comment>
+                    <source_model>NoFraud\Checkout\Model\Config\Source\NoFraudStatus</source_model>
+                </field>
+                <field id="review" translate="label" type="select" 
+                    sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Review ("Pass" or "Fail" to be determined)</label>
+                    <comment></comment>
+                    <source_model>NoFraud\Checkout\Model\Config\Source\NoFraudStatus</source_model>
+                </field>
+                <field id="fail" translate="label" type="select" 
+                    sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Fail (Fraud Detected)</label>
+                    <comment></comment>
+                    <source_model>NoFraud\Connect\Model\Config\Source\NoFraudStatus</source_model>
+                </field>
+                <field id="error" translate="label" type="select" 
+                    sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Error</label>
+                    <comment>This status will be applied if NoFraud responds with an error message instead of a pass/review/fail decision.</comment>
+                    <source_model>NoFraud\Checkout\Model\Config\Source\NoFraudStatus</source_model>
+                </field>
+            </group>
+            <group id="advance" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Advanced Nofraud Checkout Settings</label>
                 <field id="list_mode" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Checkout Mode</label>        
