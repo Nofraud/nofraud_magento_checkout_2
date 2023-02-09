@@ -77,23 +77,22 @@ class OrderFraudStatus
             ->addFieldToSelect('status')
             ->addFieldToSelect('increment_id')
             ->addFieldToSelect('entity_id')
-            ->addFieldToSelect('nofraud_status')
-            ->addFieldToSelect('nofraud_screened')
+            ->addFieldToSelect('nofraud_checkout_status')
+            ->addFieldToSelect('nofraud_checkout_screened')
             ->addFieldToSelect('nofraudcheckout')
             ->setOrder('status', 'desc');
 
         $select = $orders->getSelect()
             ->where('store_id = '.$storeId)
-            ->where('nofraud_screened != 1');
-            //->where('status = \'processing\' OR nofraud_status = \'review\'');
-            //->where('status = \'processing\'' OR 'status = \'pending\'')
-            //->where('nofraud_status = \'review\' OR nofraud_status IS NULL');
+            ->where('nofraud_checkout_screened != 1')
+            ->where('status = \'processing\' OR status = \'pending_payment\' OR status = \'payment_review\' OR nofraud_checkout_status = \'review\'');
         $logger->info($orders->getSelect());
         return $orders;
     }
 
     public function getRefundTransactionId($order) {
         $nofraudcheckout = $order->getData("nofraudcheckout");
+        error_log("\n nofraudcheckout ".$nofraudcheckout,3,BP."/var/log/checkoutlog.log");
         if(!$nofraudcheckout) {
             return false;
         }
@@ -128,7 +127,7 @@ class OrderFraudStatus
             $response = curl_exec($curl);
             curl_close($curl);
             $responseArray = json_decode($response, true);
-            $logger->info("\n".print_r($responseArray,true));
+            $logger->info("\n Nofraud response :".print_r($responseArray,true));
             $logger->info("\n after call");
             return $responseArray;
         } catch(\Exception $e) {
@@ -143,15 +142,16 @@ class OrderFraudStatus
                 if ($order && $order->getPayment()->getMethod() == 'nofraud') {
                     $transactionId = $this->getRefundTransactionId($order);
                     $logger->info("\n transactionId ".$transactionId." <=> ".$order->getId());
-                    if($transactionId){
+                    if($transactionId !== false){
+                        $logger->info("\n Found transactionId ".$transactionId);
                         $nofraudCheckoutResponse = $this->updateTransactionStatus($transactionId, $logger);
-                        $logger->info("\n transactionId ".print_r($nofraudCheckoutResponse)." <=> ".$order->getId());
+                        $logger->info("\n inside transactionId ".print_r($nofraudCheckoutResponse));
                         if ( $nofraudCheckoutResponse && isset($nofraudCheckoutResponse["Errors"]) ){
                             continue;
                         } elseif ( $nofraudCheckoutResponse && isset($nofraudCheckoutResponse["decision"]) ){
-                            $order->setNofraudScreened(true);
-                            if (isset($response['decision'])) {
-                                $statusName = $response['decision'];
+                            $order->setNofraudCheckoutScreened(true);
+                            if (isset($nofraudCheckoutResponse['decision'])) {
+                                $statusName = $nofraudCheckoutResponse['decision'];
                             }else{
                                 $statusName = 'error';
                             }
@@ -165,8 +165,8 @@ class OrderFraudStatus
                                         $order->hold();
                                     } else if ($newState) {
                                         $order->setStatus($newStatus)->setState($newState);
-                                        if( isset($response['decision']) && ($response['decision'] == 'pass') ){
-                                            $order->setNofraudStatus($response['decision']);
+                                        if( isset($nofraudCheckoutResponse['decision']) && ($nofraudCheckoutResponse['decision'] == 'pass') ){
+                                            $order->setNofraudCheckoutStatus($nofraudCheckoutResponse['decision']);
                                         }
                                     }
                                 }
