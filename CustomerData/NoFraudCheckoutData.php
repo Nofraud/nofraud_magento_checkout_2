@@ -3,6 +3,7 @@
 namespace NoFraud\Checkout\CustomerData;
 
 use Magento\Customer\CustomerData\SectionSourceInterface;
+use Magento\Framework\Locale\Resolver;
 
 class NoFraudCheckoutData extends \Magento\Framework\DataObject implements SectionSourceInterface
 {
@@ -35,6 +36,11 @@ class NoFraudCheckoutData extends \Magento\Framework\DataObject implements Secti
      * @var \Magento\Customer\Model\Session
      */
     protected $_customerSession;
+    
+    /**
+     * @var Resolver
+     */
+    private $localeResolver;
 
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -42,20 +48,24 @@ class NoFraudCheckoutData extends \Magento\Framework\DataObject implements Secti
      * @param \Magento\Checkout\Model\Cart $cart
      * @param \Magento\Customer\Model\Session $customerSession
      * @param \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory
-    */
+     */
 
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Checkout\Model\Cart $cart,
         \Magento\Customer\Model\Session $customerSession,
-        \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory
+        \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        Resolver $localeResolver
     ){
         $this->scopeConfig          = $scopeConfig;
         $this->_checkoutSession     = $checkoutSession;
         $this->_cart                = $cart;
         $this->_quoteIdMaskFactory  = $quoteIdMaskFactory;
         $this->_customerSession     = $customerSession;
+        $this->_storeManager        = $storeManager;
+        $this->localeResolver       = $localeResolver;
     }
 
     public function getConfig($config_path){
@@ -66,7 +76,6 @@ class NoFraudCheckoutData extends \Magento\Framework\DataObject implements Secti
     }
 
     public function getSectionData() {
-
         $isLoggedIn     = $this->_customerSession->isLoggedIn();
         $quoteIdMask    = $this->_quoteIdMaskFactory->create();
 
@@ -77,16 +86,37 @@ class NoFraudCheckoutData extends \Magento\Framework\DataObject implements Secti
             $quoteId    = $this->_checkoutSession->getQuote()->getId();
             $cartId     = $quoteIdMask->load($quoteId,'quote_id')->getMaskedId();
         }
-        error_log("\n quoteId: ".$cartId,3,BP."/var/log/NFC.log");
-
-        error_log("\n is logged in: ".$isLoggedIn,3,BP."/var/log/NFC.log");
 
         $isNofraudenabled = (int) $this->getConfig(self::XML_PATH_ENABLED);
-        
+        $currencyCode     = $this->getCurrentCurrencyCode();
+        $localeCode       = $this->getCurrentLocale();
+
         return [
-            'quote_id' => $cartId,
-            'is_logged' => $isLoggedIn,
-            'isNofraudenabled' => $isNofraudenabled
+            'quote_id'              => $cartId,
+            'is_logged'             => $isLoggedIn,
+            'isNofraudenabled'      => $isNofraudenabled,
+            'currencycode'          => $currencyCode,
+            'languagecode'          => $localeCode
         ];
+    }
+
+    /**
+    * Get store currency code
+    *
+    * @return string
+    */
+    public function getCurrentCurrencyCode() {
+        return $this->_storeManager->getStore()->getCurrentCurrencyCode();
+    }
+
+    /**
+    * Get store language code
+    *
+    * @return string
+    */
+    public function getCurrentLocale(){
+        $currentLocaleCode = $this->localeResolver->getLocale(); // fr_CA
+        $languageCode = strstr($currentLocaleCode, '_', true);
+        return $languageCode;
     }
 }
