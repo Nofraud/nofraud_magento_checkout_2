@@ -90,13 +90,14 @@ class NoFraudCheckoutData extends \Magento\Framework\DataObject implements Secti
         $isNofraudenabled = (int) $this->getConfig(self::XML_PATH_ENABLED);
         $currencyCode     = $this->getCurrentCurrencyCode();
         $localeCode       = $this->getCurrentLocale();
-
+        $storeCode        = $this->getCurrentStoreCode();
         return [
             'quote_id'              => $cartId,
             'is_logged'             => $isLoggedIn,
             'isNofraudenabled'      => $isNofraudenabled,
             'currencycode'          => $currencyCode,
-            'languagecode'          => $localeCode
+            'languagecode'          => $localeCode,
+            'storecode'             => $storeCode
         ];
     }
 
@@ -118,5 +119,14 @@ class NoFraudCheckoutData extends \Magento\Framework\DataObject implements Secti
         $currentLocaleCode = $this->localeResolver->getLocale(); // fr_CA
         $languageCode = strstr($currentLocaleCode, '_', true);
         return $languageCode;
+    }
+
+    /**
+     * Get store store code
+     *
+     * @return string
+     */
+    public function getCurrentStoreCode() {
+        return $this->_storeManager->getStore()->getCode();
     }
 }
