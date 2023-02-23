@@ -24,4 +24,10 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+	<route url="/V1/nofraudcheckout/fetchgiftcard" method="GET">
+        <service class="NoFraud\Checkout\Api\GiftCardAccountRepositoryInterface" method="getCertificateDetails"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
 </routes>
