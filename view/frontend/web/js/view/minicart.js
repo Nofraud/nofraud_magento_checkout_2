@@ -134,6 +134,7 @@ define([
             var cartId          = customerData.get('nofrudcheckout')().quote_id;
             var currencyCode    = customerData.get('nofrudcheckout')().currencycode;
             var languageCode    = customerData.get('nofrudcheckout')().languagecode;
+            var storeCode       = customerData.get('nofrudcheckout')().storecode;
 
             if(cartId){
                 //if(window.nofraudcheckout_firstload > 1) {
@@ -146,6 +147,7 @@ define([
                     params['data-nf-store-url'] = BASE_URL;
                     params['currencyCode'] = currencyCode;
                     params['languageCode'] = languageCode;
+                    params['storeCode'] = storeCode;
                     console.log(params);
                     nfOpenCheckout(params);
                 //}

@@ -15,7 +15,9 @@ class OrderFraudStatus
         'pass',
         'review',
         'fail',
+        'fraud',
         'error',
+        'fraudulent',
     ];
 
     private $orders;
@@ -34,6 +36,11 @@ class OrderFraudStatus
 
     protected $_logger;
 
+    /**
+     * @var StateIndex
+     */
+    protected $stateIndex = [];
+
     public function __construct(
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orders,
         \Magento\Sales\Model\ResourceModel\Order\Status\CollectionFactory $orderStatusCollection,
@@ -42,16 +49,24 @@ class OrderFraudStatus
         \NoFraud\Checkout\Helper\Data $dataHelper,
         \NoFraud\Connect\Api\ApiUrl $apiUrl,
         \NoFraud\Connect\Order\Processor $orderProcessor,
-        \Magento\Framework\Module\Manager $moduleManager
+        \Magento\Framework\Module\Manager $moduleManager,
+        \Magento\Sales\Model\Order\Invoice $invoice,
+        \Magento\Sales\Model\Order\CreditmemoFactory $creditMemoFacory,
+        \Magento\Sales\Model\Service\CreditmemoService $creditmemoService,
+        \Magento\Sales\Api\Data\OrderInterface $orderInterface
     ) {
-        $this->orders = $orders;
-        $this->orderStatusCollection = $orderStatusCollection;
-        $this->storeManager = $storeManager;
-        $this->requestHandler = $requestHandler;
-        $this->dataHelper = $dataHelper;
-        $this->apiUrl = $apiUrl;
-        $this->orderProcessor = $orderProcessor;
-        $this->moduleManager = $moduleManager;
+        $this->orders                   = $orders;
+        $this->orderStatusCollection    = $orderStatusCollection;
+        $this->storeManager             = $storeManager;
+        $this->requestHandler           = $requestHandler;
+        $this->dataHelper               = $dataHelper;
+        $this->apiUrl                   = $apiUrl;
+        $this->orderProcessor           = $orderProcessor;
+        $this->moduleManager            = $moduleManager;
+        $this->invoice                  = $invoice;
+        $this->creditMemoFacory         = $creditMemoFacory;
+        $this->creditmemoService        = $creditmemoService;
+        $this->orderInterface           = $orderInterface;
     }
 
     public function execute()
@@ -61,13 +76,16 @@ class OrderFraudStatus
         $logger = new \Zend_Log();
         $logger->addWriter($writer);
 
+        $merchantPreferences = $this->getNofraudSettings($logger);
+        $settings            = $merchantPreferences['platform']['settings'];
+
         foreach ($storeList as $store) {
             $storeId = $store->getId();
             if (!$this->dataHelper->getEnabled($storeId)) {
                 return;
             }
             $orders = $this->readOrders($storeId, $logger);
-            $this->updateOrdersFromNoFraudApiResult($orders, $storeId, $logger);
+            $this->updateOrdersFromNoFraudApiResult($orders, $storeId, $logger,$settings);
         }
     }
 
@@ -80,11 +98,12 @@ class OrderFraudStatus
             ->addFieldToSelect('nofraud_checkout_status')
             ->addFieldToSelect('nofraud_checkout_screened')
             ->addFieldToSelect('nofraudcheckout')
+            ->addFieldToSelect('grand_total')
             ->setOrder('status', 'desc');
 
         $select = $orders->getSelect()
             ->where('store_id = '.$storeId)
-            ->where('nofraud_checkout_screened != 1')
+            ->where('nofraud_checkout_screened != 1 OR nofraud_checkout_status = \'review\'')
             ->where('status = \'processing\' OR status = \'pending_payment\' OR status = \'payment_review\' OR nofraud_checkout_status = \'review\'');
         $logger->info($orders->getSelect());
         return $orders;
@@ -135,7 +154,37 @@ class OrderFraudStatus
         }
     }
 
-    public function updateOrdersFromNoFraudApiResult($orders, $storeId, $logger)
+    private function getNofraudSettings($logger) {
+        $nfToken    = $this->dataHelper->getNofrudCheckoutAppNfToken();
+        $merchantId = $this->dataHelper->getMerchantId();
+        $apiUrl     = $this->dataHelper->getNofraudMerSettings().$merchantId;
+        $logger->info("\n".$apiUrl);
+        try {
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => $apiUrl,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'GET',
+                CURLOPT_HTTPHEADER => array(
+                    "Content-Type: application/json",
+                    "x-nf-api-token:{$nfToken}"
+                ),
+            ));
+            $response = curl_exec($curl);
+            curl_close($curl);
+            $responseArray = json_decode($response, true);
+            return $responseArray;
+        } catch(\Exception $e) {
+            $logger->info("\n".$e->getMessage());
+        }
+    }
+
+    public function updateOrdersFromNoFraudApiResult($orders, $storeId, $logger,$settings)
     {
         foreach ($orders as $order) {
             try {
@@ -145,34 +194,80 @@ class OrderFraudStatus
                     if($transactionId !== false){
                         $logger->info("\n Found transactionId ".$transactionId);
                         $nofraudCheckoutResponse = $this->updateTransactionStatus($transactionId, $logger);
-                        $logger->info("\n inside transactionId ".print_r($nofraudCheckoutResponse));
+                        $logger->info("\n inside transactionId ".print_r($nofraudCheckoutResponse,true)); 
                         if ( $nofraudCheckoutResponse && isset($nofraudCheckoutResponse["Errors"]) ){
                             continue;
                         } elseif ( $nofraudCheckoutResponse && isset($nofraudCheckoutResponse["decision"]) ){
                             $order->setNofraudCheckoutScreened(true);
                             if (isset($nofraudCheckoutResponse['decision'])) {
                                 $statusName = $nofraudCheckoutResponse['decision'];
+                                $noFraudStatus = $nofraudCheckoutResponse['decision'];
                             }else{
                                 $statusName = 'error';
+                                $noFraudStatus = 'error';
                             }
-                            error_log("\n status Name ".$statusName." <=> ".$order->getId(),3,BP."/var/log/bothenable.log");
-                            if (isset($statusName)) {
-                                $newStatus = $this->dataHelper->getCustomStatusConfig($statusName, $storeId);
-                                if (!empty($newStatus)) {
-                                    $newState = $this->getStateFromStatus($newStatus);
-                                    error_log("\n new state ".$newState." <=> ".$order->getId(),3,BP."/var/log/bothenable.log");
-                                    if ($newState == Order::STATE_HOLDED) {
-                                        $order->hold();
-                                    } else if ($newState) {
-                                        $order->setStatus($newStatus)->setState($newState);
-                                        if( isset($nofraudCheckoutResponse['decision']) && ($nofraudCheckoutResponse['decision'] == 'pass') ){
-                                            $order->setNofraudCheckoutStatus($nofraudCheckoutResponse['decision']);
+                            error_log("\n status Name ".$statusName." <=> ".$order->getId(),3,BP."/var/log/NFPstatus.log");
+                            error_log("\n status settings ".print_r($settings,true)." <=> ".$order->getId(),3,BP."/var/log/NFPstatus.log");
+                            if (in_array($noFraudStatus,$this->orderStatusesKeys)) {
+                                $orderRefundedInNofraud = false;
+                                if ($noFraudStatus == "pass") {
+                                    error_log("\n inside "." <=> ".$order->getId(),3,BP."/var/log/cron_pass.log");
+                                    $newStatus  =  $settings['passOrderStatus'];
+                                    $newState   = $this->getStateFromStatus($newStatus);
+                                    error_log("\n status ".$newStatus." <=> ".$order->getId(),3,BP."/var/log/cron_pass.log");
+                                    error_log("\n state ".$newState." <=> ".$order->getId(),3,BP."/var/log/cron_pass.log");
+                                    $order->setStatus($newStatus)->setState($newState);
+                                    $order->setNofraudCheckoutStatus($noFraudStatus);
+                                    $order->save();
+                                } else if ( $noFraudStatus == "fail" || $noFraudStatus == "fraudulent" || $noFraudStatus == "fraud" ) {
+                                    if (isset($settings['shouldAutoRefund'])) {
+                                        $refundResponse = $this->makeRefund($order);
+                                        error_log("\n inside "." <=> ".$order->getId(),3,BP."/var/log/cron_refund.log");
+                                        error_log("\n res ".print_r($refundResponse,true)." <=> ".$order->getId(),3,BP."/var/log/cron_refund.log");
+                                        if($refundResponse) {
+                                            $responseArray = json_decode($refundResponse, true);
+                                            if($responseArray && isset($responseArray["success"]) && $responseArray["success"] == true) {
+                                                error_log("\n success "." <=> ".$order->getId(),3,BP."/var/log/cron_refund.log");
+                                                $order->setNofraudCheckoutStatus($noFraudStatus);
+                                                $this->createCreditMemo($order->getId());
+                                                $orderRefundedInNofraud = true;
+                                                $updateOrder      = true;
+                                            } else if($responseArray && isset($responseArray["errorMsg"])) {
+                                                continue;
+                                            }
+                                        } else {
+                                            error_log("\n No Response from API endpoint "." <=> ".$order->getId(),3,BP."/var/log/cron_refund.log");
+                                            continue;
                                         }
                                     }
+                                    if (isset($settings['shouldAutoCancel'])) {
+                                        if (isset($settings['shouldAutoRefund']) && $settings['shouldAutoRefund'] == true && $orderRefundedInNofraud == true) {
+                                            error_log("\n inside " . " <=> " . $order->getId(), 3, BP . "/var/log/cron_cancel.log");
+                                            $newState = Order::STATE_CANCELED;
+                                            $order->cancel();
+                                            $order->setStatus($newState)->setState($newState);
+                                            error_log("\n state " . $newState . " <=> " . $order->getId(), 3, BP . "/var/log/cron_cancel.log");
+                                        }
+                                        if (empty($settings['shouldAutoRefund']) || $settings['shouldAutoRefund'] == false) {
+                                            error_log("\n inside " . " <=> " . $order->getId(), 3, BP . "/var/log/cron_cancel.log");
+                                            $newState = Order::STATE_CANCELED;
+                                            $order->cancel();
+                                            $order->setStatus($newState)->setState($newState);
+                                            error_log("\n state " . $newState . " <=> " . $order->getId(), 3, BP . "/var/log/cron_cancel.log");
+                                        }
+                                    }
+                                    $order->setNofraudCheckoutStatus($noFraudStatus);
+                                    $order->save();
+                                } else if ($noFraudStatus == "review") {
+                                    $newStatus  =  "Pending Payment"
+                                    $newState   =  "payment_review";
+                                    error_log("\n status ".$newStatus." <=> ".$order->getId(),3,BP."/var/log/cron_review.log");
+                                    $order->setStatus($newStatus)->setState($newState);
+                                    $order->setNofraudCheckoutStatus($noFraudStatus);
+                                    $order->save();
                                 }
                             }
-                            $order->save();
-                            error_log("\n newStatus ".$newStatus." <=> ".$order->getId(),3,BP."/var/log/bothenable.log");
+                            error_log("\n Last save ".$noFraudStatus." <=> ".$order->getId(),3,BP."/var/log/NFPstatus.log");
                         }
                     }
                 }
@@ -193,4 +288,101 @@ class OrderFraudStatus
         }
         return $this->stateIndex[$state] ?? null;
     }
+
+    /**
+     * get payment Transaction Id
+     */
+    private function makeRefund($order) {
+        $nofraudcheckout = $order->getData("nofraudcheckout");
+        if(!$nofraudcheckout) {
+            return false;
+        }
+        $nofraudcheckoutArray = json_decode($nofraudcheckout, true);
+        if(isset($nofraudcheckoutArray["transaction_id"])) {
+            $transaction_id = explode("#",$nofraudcheckoutArray["transaction_id"]);
+            $transactionId = $transaction_id[0] ?? "";
+            if (!empty($transactionId) && $transactionId != "") {
+                $data = [
+                    "authId" => $transactionId,
+                    "amount" => round($order->getGrandTotal(),2)
+                ];
+                $refundResponse = $this->initiateNofraudRefund($data);
+                return $refundResponse;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Refund from NoFraud
+     */
+    private function initiateNofraudRefund($data) {
+        $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/cron_refund-api-'.date("d-m-Y").'.log');
+        $logger = new \Zend_Log();
+        $logger->addWriter($writer);
+
+        $logger->info("== Request information ==");
+        $logger->info(print_r($data, true));
+
+        $returnsFund = [];
+        $returnsFund = ["success" => false];
+
+        $apiUrl = $this->dataHelper->getRefundApiUrl();
+        $apikey = $this->dataHelper->getRefundApiKey();
+        $logger->info($apikey);
+        $logger->info($apiUrl);
+        //$apiUrl = "https://dynamic-checkout-api-staging2.nofraud-test.com/api/v1/hooks/refund/megento_merchant_1";
+        //$apikey = "Bd4jKQ2qrzjCRdxW28";
+
+
+        try {
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => $apiUrl,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => json_encode($data),
+                CURLOPT_HTTPHEADER => array(
+                    "Content-Type: application/json",
+                    "X-NF-HOOK-AUTH: {$apikey}"
+                ),
+            ));
+            $response = curl_exec($curl);
+            curl_close($curl);
+            $logger->info("== Response Information ==");
+            $logger->info(print_r($response,true));
+            return $response;
+        } catch(\Exception $e) {
+            $returnsRefund = ["error_message" => $e->getMessage(), "success" => false];
+        }
+        return $returnsRefund;
+    }
+
+    /**
+     *  create a credit memo
+    */
+    private function createCreditMemo($orderId)
+    {
+        try {
+            $order      = $this->orderInterface->load($orderId);
+            $invoices   = $order->getInvoiceCollection();
+            foreach ($invoices as $invoice) {
+                $invoiceIncrementid = $invoice->getIncrementId();
+                $invoiceInstance = $this->invoice->loadByIncrementId($invoiceIncrementid);
+                $creditmemo = $this->creditMemoFacory->createByOrder($order);
+                $creditmemo->setInvoice($invoiceInstance);
+                $this->creditmemoService->refund($creditmemo);
+                error_log("\n CreditMemo Succesfully Created For Order: " . $invoiceIncrementid, 3, BP . "/var/log/cron_credit.log");
+            }
+        } catch (\Exception $e) {
+            error_log("\n Creditmemo Not Created". $e->getMessage(),3,BP."/var/log/cron_credit.log");
+        }
+    }
+
+
 }
