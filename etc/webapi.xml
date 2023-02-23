@@ -12,4 +12,16 @@
 			 <resource ref="anonymous" />
 		</resources>
 	</route>
+	<route url="/V1/nofraudcheckout/initialize" method="POST">
+		<service class="NoFraud\Checkout\Api\SetConfiguration" method="enableConfiguration" />
+		<resources>
+			<resource ref="anonymous" />
+		</resources>
+	</route>
+	<route method="GET" url="/V1/nofraudcheckout/fetchstorecredit">
+        <service class="NoFraud\Checkout\Api\StoreCreditInterface" method="getstoreCreditByCustomerId"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>

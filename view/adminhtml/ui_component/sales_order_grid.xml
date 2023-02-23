@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <columns name="sales_order_columns">
+        <column name="nofraud_checkout_screened" class="NoFraud\Checkout\Ui\Component\Listing\Column\Screened">
+            <settings>
+                <filter>select</filter>
+                <options class="NoFraud\Checkout\Ui\Component\Listing\Column\Screened\Options"/>
+                <visible>true</visible>
+                <dataType>select</dataType>
+                <label translate="true">NoFraud Checkout Screened</label>
+            </settings>
+        </column>
+        <column name="nofraud_checkout_status" class="NoFraud\Checkout\Ui\Component\Listing\Column\Status"
+        component="NoFraud_Checkout/js/grid/cells/link">
+            <settings>
+                <visible>true</visible>
+                <label translate="true">NoFraud Checkout Status</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <sortable>false</sortable>
+                <disableAction>true</disableAction>
+            </settings>
+        </column>
+    </columns>
+</listing>

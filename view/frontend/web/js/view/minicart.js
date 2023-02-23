@@ -92,18 +92,16 @@ define([
 			var sections = ['cart'];
 			customerData.invalidate(sections);
 			customerData.reload(sections, true); 
-				
-			console.log(customerData);
-			console.log('override reload data');
 			window.nofraudcheckout_firstload = 0;
-			console.log('override reload data :' + window.nofraudcheckout_firstload); 
-            cartData.subscribe(function (updatedCart) {
+
+		    cartData.subscribe(function (updatedCart) {
                 addToCartCalls--;
                 this.isLoading(addToCartCalls > 0);
                 sidebarInitialized = false;
                 this.update(updatedCart);
                 initSidebar();
             }, this);
+
             $('[data-block="minicart"]').on('contentLoading', function () {
                 addToCartCalls++;
                 self.isLoading(true);
@@ -127,21 +125,19 @@ define([
          * Close mini shopping cart.
          */
         closeMinicart: function () {
-			
-            $('[data-block="minicart"]').find('[data-role="dropdownDialog"]').dropdownDialog('close');
-			
-        },
+	        $('[data-block="minicart"]').find('[data-role="dropdownDialog"]').dropdownDialog('close');
+	    },
+
         openPopup: function () { 
-			var cartData = customerData.get('cart');
-			var customer = customerData.get('customer');
-            var cartId   = customerData.get('nofrudcheckout')().quote_id;
-           
+			var cartData        = customerData.get('cart');
+			var customer        = customerData.get('customer');
+            var cartId          = customerData.get('nofrudcheckout')().quote_id;
+            var currencyCode    = customerData.get('nofrudcheckout')().currencycode;
+            var languageCode    = customerData.get('nofrudcheckout')().languagecode;
+            var storeCode       = customerData.get('nofrudcheckout')().storecode;
 
             if(cartId){
-
-            	//window.nofraudcheckout_firstload += 1;
-
-		        //if(window.nofraudcheckout_firstload > 1) {
+                //if(window.nofraudcheckout_firstload > 1) {
                     $('[data-block="minicart"]').find('[data-role="dropdownDialog"]').dropdownDialog('close');
                     var params = [];
                     params['data-nf-access-token'] = customer().fullname && customer().firstname ? window.nofraudcheckout_accesstokenforcustomer : window.nofraudcheckout_accesstokenfornotlogin;
@@ -149,10 +145,12 @@ define([
                     params['data-nf-customer-is-logged-in'] = customer().fullname && customer().firstname ? 1 : 0;
                     params['data-nf-merchant-id'] = window.nofraudcheckout_merchant;
                     params['data-nf-store-url'] = BASE_URL;
+                    params['currencyCode'] = currencyCode;
+                    params['languageCode'] = languageCode;
+                    params['storeCode'] = storeCode;
                     console.log(params);
                     nfOpenCheckout(params);
                 //}
-                
 			}
         },
 
@@ -191,7 +189,6 @@ define([
                     this.cart[name] = ko.observable();
                 }
             }
-
             return this.cart[name]();
         },
 
@@ -210,9 +207,7 @@ define([
          */
         getCartItems: function () {
             var items = this.getCartParamUnsanitizedHtml('items') || [];
-
             items = items.slice(parseInt(-this.maxItemsToDisplay, 10));
-
             return items;
         },
 
@@ -231,7 +226,6 @@ define([
         * @returns {Number}
         */
         isNoFraudEnabled: function () {
-            console.log(" isNoFraudEnabled: "+customerData.get('nofrudcheckout')().isNofraudenabled);
             return customerData.get('nofrudcheckout')().isNofraudenabled;
         }
     });

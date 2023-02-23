@@ -1,17 +1,8 @@
-<?php
-$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-$customerId = $objectManager->create('\Magento\Customer\Model\Session')->getCustomer()->getId();
-$customer = $objectManager->create('Magento\Customer\Model\Customer')->load($customerId);
-
-$customerToken 	= $objectManager->create('Magento\Integration\Model\Oauth\TokenFactory')->create();
-$tokenKey = $customerToken->createCustomerToken($customer->getId())->getToken();
-
-?>
 <script  type="text/javascript"  src="<?php echo $this->helper('NoFraud\Checkout\Helper\Data')->getApiSourceJs() ?>"></script>
 <script>
 	window.nofraudcheckout_merchant = "<?php echo $this->helper('NoFraud\Checkout\Helper\Data')->getMerchantId() ?>";
 	window.nofraudcheckout_accesstokenfornotlogin = "";
-	window.nofraudcheckout_accesstokenforcustomer = "<?php echo $tokenKey ?>";
+	window.nofraudcheckout_accesstokenforcustomer = "<?php echo $block->getCustomerToken(); ?>";
 	window.nofraudcheckout_firstload = 0;
 	
 	console.log('init :' + window.nofraudcheckout_firstload);
