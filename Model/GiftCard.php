@@ -4,25 +4,14 @@ namespace NoFraud\Checkout\Model;
 
 use NoFraud\Checkout\Api\GiftCardAccountRepositoryInterface;
 use Amasty\GiftCardAccount\Api\Data\GiftCardAccountInterface;
-use Amasty\GiftCard\Api\CodeRepositoryInterface;
 use Amasty\GiftCard\Model\OptionSource\Status;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Amasty\GiftCardAccount\Model\GiftCardAccount\ResourceModel\CollectionFactory;
-use Amasty\GiftCardAccount\Api\Data\GiftCardAccountInterfaceFactory;
-use Amasty\GiftCardAccount\Model\GiftCardAccount\ResourceModel\Account as AccountResource;
+use Magento\Framework\Webapi\Rest\Request;
+use Magento\Framework\Module\Manager;
+use Magento\Framework\ObjectManagerInterface;
 
 class GiftCard implements GiftCardAccountRepositoryInterface
 {
-    /**
-     * @var CodeRepositoryInterface
-     */
-    private $codeRepository;
-
-    /**
-     * @var CollectionFactory
-     */
-    private $collectionFactory;
-
     /**
      * Model storage
      * @var array
@@ -30,43 +19,46 @@ class GiftCard implements GiftCardAccountRepositoryInterface
     private $accounts = [];
 
     /**
-     * @var GiftCardAccountInterfaceFactory
+     * @var Request
      */
-    private $accountFactory;
-
-    /**
-     * @var AccountResource
-     */
-    private $resource;
-
     protected $request;
 
+    /**
+     * @var Manager
+     */
+    protected $moduleManager;
+
+    /**
+     * @var ObjectManagerInterface
+     */
+    protected $objectManager;
+
     public function __construct(
-        \Magento\Framework\Webapi\Rest\Request $request,
-        CodeRepositoryInterface         $codeRepository,
-        CollectionFactory               $collectionFactory,
-        GiftCardAccountInterfaceFactory $accountFactory,
-        AccountResource                 $resource
+        Request                 $request,
+        Manager                 $moduleManager,
+        ObjectManagerInterface  $objectManager
     ) {
-        $this->codeRepository    = $codeRepository;
-        $this->collectionFactory = $collectionFactory;
-        $this->accountFactory    = $accountFactory;
-        $this->resource          = $resource;
-        $this->request           = $request;
+        $this->request        = $request;
+        $this->moduleManager  = $moduleManager;
+        $this->objectManager  = $objectManager;
     }
 
     public function getById(int $id): GiftCardAccountInterface
     {
         if (!isset($this->accounts[$id])) {
-            /** @var GiftCardAccountInterface $account */
-            $account = $this->accountFactory->create();
-            $this->resource->load($account, $id);
+            $accountFactory  = $this->objectManager->get("\Amasty\GiftCardAccount\Api\Data\GiftCardAccountInterfaceFactory");
+            $account         = $accountFactory->create();
+
+            $resource = $this->objectManager->get("\Amasty\GiftCardAccount\Model\GiftCardAccount\ResourceModel\Account");
+            $resource->load($account, $id);
 
             if (!$account->getAccountId()) {
                 throw new NoSuchEntityException(__('Account with specified ID "%1" not found.', $id));
             }
             if ($codeId = $account->getCodeId()) {
-                $code = $this->codeRepository->getById($codeId);
+                $codeRepository = $this->objectManager->get("\Amasty\GiftCard\Api\CodeRepositoryInterface");
+
+                $code = $codeRepository->getById($codeId);
                 $account->setCodeModel($code);
             }
             $this->accounts[$id] = $account;
@@ -77,30 +69,40 @@ class GiftCard implements GiftCardAccountRepositoryInterface
 
     public function getCertificateDetails()
     {
-        $body      = $this->request->getBodyParams();
-        $giftCode  = $body['data']['gift_code'];
-        try{
-            $results   = $this->getByCode($giftCode);
-            if($results === false){
+        if ($this->moduleManager->isEnabled('Amasty_GiftCardAccount') && $this->moduleManager->isEnabled('Amasty_GiftCard')) {
+            try {
+                $body      = $this->request->getBodyParams();
+                $giftCode  = $body['data']['gift_code'];
+                $results   = $this->getByCode($giftCode);
+
+                if ($results === false) {
+                    $response = [
+                        [
+                            "code" => 'error',
+                            "message" => "specified code " . $giftCode . " not found",
+                        ],
+                    ];
+                } else {
+                    $response = [
+                        [
+                            "code" => 'success',
+                            "message" => $results['current_value']
+                        ],
+                    ];
+                }
+            } catch (\Exception $e) {
                 $response = [
                     [
                         "code" => 'error',
-                        "message" => "specified code ".$giftCode." not found",
-                    ],
-                ];
-            }else{
-                $response = [
-                    [
-                        "code" => 'success',
-                        "message" => $results['current_value']
+                        "message" => $e->getMessage(),
                     ],
                 ];
             }
-        }catch (\Exception $e) {
+        } else {
             $response = [
                 [
                     "code" => 'error',
-                    "message" => $e->getMessage(),
+                    "message" => "Gift card extension not enable",
                 ],
             ];
         }
@@ -109,12 +111,15 @@ class GiftCard implements GiftCardAccountRepositoryInterface
 
     public function getByCode(string $code): GiftCardAccountInterface
     {
-        $code = $this->codeRepository->getByCode($code);
+        $codeRepository  = $this->objectManager->get("\Amasty\GiftCard\Api\CodeRepositoryInterface");
+
+        $code = $codeRepository->getByCode($code);
 
         if ($code->getStatus() !== Status::USED) {
             return false;
         }
-        $account = $this->collectionFactory->create()
+        $collectionFactory  = $this->objectManager->get("\Amasty\GiftCardAccount\Model\GiftCardAccount\ResourceModel\CollectionFactory");
+        $account = $collectionFactory->create()
             ->addFieldToFilter(GiftCardAccountInterface::CODE_ID, $code->getCodeId())
             ->getFirstItem();
 
