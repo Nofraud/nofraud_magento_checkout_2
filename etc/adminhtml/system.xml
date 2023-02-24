@@ -39,22 +39,11 @@
                     <validate>required-entry</validate>
                     <comment><![CDATA[Don't have an account? Please <a href="https://portal.nofraud.com" target="_blank"> click here</a> to create one. You will find it from nofraud portal through your account.]]></comment>
                 </field>
-                <field id="cron_expression" translate="Review Fraud Status Cron" type="text" sortOrder="50" showInDefault="1">
+                <field id="cron_expression" translate="Review Fraud Status Cron" type="select" sortOrder="50" showInDefault="1">
                     <label>Review Fraud Status Cron</label>
+                    <source_model>NoFraud\Checkout\Model\Config\Source\CronFrequency</source_model>
+                    <comment>Select the cron time frequency at you would to run the cron</comment>
                     <validate>required-entry</validate>
-                    <comment><![CDATA[
-                    Enter comma separated cron expressions time to check the Review Fraud Status Cron.<br/>
-<pre>
-* * * * *
-| | | | |
-| | | | +---- Day of the Week   (range: 0-6, 1 standing for Monday)
-| | | +------ Month of the Year (range: 1-12)
-| | +-------- Day of the Month  (range: 1-31)
-| +---------- Hour              (range: 0-23)
-+------------ Minute            (range: 0-59)
-Example: 0 0 * * * Daily at midnight
-</pre>
-                            ]]></comment>
                     <depends>
                         <field id="enabled">1</field>
                     </depends>
