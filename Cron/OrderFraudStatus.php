@@ -78,14 +78,15 @@ class OrderFraudStatus
 
         $merchantPreferences = $this->getNofraudSettings($logger);
         $settings            = $merchantPreferences['platform']['settings'];
-
+        $manualCapture       = $merchantPreferences['settings']['manualCapture']['isEnabled'];
+        error_log(print_r($merchantPreferences['settings']['manualCapture'],true),3,BP."/var/log/settings.log");
         foreach ($storeList as $store) {
             $storeId = $store->getId();
             if (!$this->dataHelper->getEnabled($storeId)) {
                 return;
             }
             $orders = $this->readOrders($storeId, $logger);
-            $this->updateOrdersFromNoFraudApiResult($orders, $storeId, $logger,$settings);
+            $this->updateOrdersFromNoFraudApiResult($orders, $storeId, $logger,$settings,$manualCapture);
         }
     }
 
@@ -184,7 +185,7 @@ class OrderFraudStatus
         }
     }
 
-    public function updateOrdersFromNoFraudApiResult($orders, $storeId, $logger,$settings)
+    public function updateOrdersFromNoFraudApiResult($orders, $storeId, $logger, $settings, $manualCapture)
     {
         foreach ($orders as $order) {
             try {
@@ -220,7 +221,7 @@ class OrderFraudStatus
                                     $order->setNofraudCheckoutStatus($noFraudStatus);
                                     $order->save();
                                 } else if ( $noFraudStatus == "fail" || $noFraudStatus == "fraudulent" || $noFraudStatus == "fraud" ) {
-                                    if (isset($settings['shouldAutoRefund'])) {
+                                    if ( isset($settings['shouldAutoRefund']) && (empty($manualCapture) || $manualCapture == false) ) {
                                         $refundResponse = $this->makeRefund($order);
                                         error_log("\n inside "." <=> ".$order->getId(),3,BP."/var/log/cron_refund.log");
                                         error_log("\n res ".print_r($refundResponse,true)." <=> ".$order->getId(),3,BP."/var/log/cron_refund.log");
