@@ -44,7 +44,7 @@ class SetConfigurationData implements SetConfiguration
 
         if (isset($enabled) && isset($merchant_id) && isset($nf_token)) {
             try {
-                if($enabled=="yes"){
+                if($enabled == true){
                     $this->SetData(self::ENABLED, 1);
                 }else{
                     $this->SetData(self::ENABLED, 0);
