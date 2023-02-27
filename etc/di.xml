@@ -6,4 +6,5 @@
 	<preference for="NoFraud\Checkout\Api\SetConfiguration" type="NoFraud\Checkout\Model\SetConfigurationData" />
 	<preference for="NoFraud\Checkout\Api\StoreCreditInterface" type="NoFraud\Checkout\Model\StoreCredit"/>
 	<preference for="NoFraud\Checkout\Api\GiftCardAccountRepositoryInterface" type="NoFraud\Checkout\Model\GiftCard"/>
+	<preference for="NoFraud\Checkout\Api\GiftCardAccountManagementInterface" type="NoFraud\Checkout\Model\GiftCardAccountManagement"/>
 </config>
