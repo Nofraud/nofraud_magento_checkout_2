@@ -11,6 +11,8 @@ class SetConfigurationData implements SetConfiguration
 
     protected $configWriter;
 
+    const ENABLED = "nofraud/general/enabled";
+
     const MERCHANT_Id = "nofraud/general/merchant";
 
     const NF_TOKEN    = "nofraud/general/nf_token";
@@ -35,18 +37,25 @@ class SetConfigurationData implements SetConfiguration
 		$logger->addWriter($writer);
 		$logger->info('enableConfiguration');
 		$logger->info(json_encode($data));
-		
+
+        $enabled        = $data["enabled"];
         $merchant_id    = $data["merchant_id"];
         $nf_token       = $data["nf_token"];
 
-        if (isset($merchant_id) && isset($nf_token)) {
+        if (isset($enabled) && isset($merchant_id) && isset($nf_token)) {
             try {
+                if($enabled=="yes"){
+                    $this->SetData(self::ENABLED, 1);
+                }else{
+                    $this->SetData(self::ENABLED, 0);
+                }
                 $this->SetData(self::MERCHANT_Id, $merchant_id);
                 $this->SetData(self::NF_TOKEN, $nf_token);
+
                 $response = [
                     [
                         "code" => 'success',
-                        "message" => 'Merchant Id and Nf Token updated successfully !',
+                        "message" => 'Extension, Merchant Id and Nf Token updated successfully !',
                     ],
                 ];
             }catch(\Exception $e) {
