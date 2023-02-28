@@ -36,4 +36,10 @@
             <resource ref="anonymous" />
         </resources>
     </route>
+	<route url="/V1/nofraudcheckout/carts/gift-card/remove" method="PUT">
+        <service class="NoFraud\Checkout\Api\GiftCardAccountManagementInterface" method="removeGiftCardFromCart"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
 </routes>
