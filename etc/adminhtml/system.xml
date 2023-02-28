@@ -24,15 +24,18 @@
                     <label>Enable NoFraud Checkout</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>This settings will activate or deactivate Nofraud Checkout.</comment>
+                    <frontend_model>NoFraud\Checkout\Block\Adminhtml\System\Config\Form\Field\Disable</frontend_model>
                 </field>
 				<field id="merchant" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Merchant Id</label>
                     <validate>required-entry</validate>
                     <comment><![CDATA[Don't have an account? Please <a href="https://portal.nofraud.com" target="_blank"> click here</a> to create one.]]></comment>
+                    <frontend_model>NoFraud\Checkout\Block\Adminhtml\System\Config\Form\Field\Disable</frontend_model>
                 </field>
                 <field id="api_key" translate="label" type="text" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>API Key</label>
-                     <validate>required-entry</validate>
+                    <validate>required-entry</validate>
+                    <frontend_model>NoFraud\Checkout\Block\Adminhtml\System\Config\Form\Field\Disable</frontend_model> 
                 </field>
                 <field id="nf_token" translate="label" type="text" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>NF Token</label>
@@ -49,7 +52,7 @@
                     </depends>
                 </field>
             </group>
-            <group id="order_statuses" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <!-- <group id="order_statuses" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Order Statuses</label>
                 <comment>The following statuses will be applied to orders after checkout, according to the decision returned from NoFraud ("pass", "review", or "fail"). If no custom status is selected, NoFraud will still provide a transaction report but the order's status will not be changed.</comment>
                 <field id="pass" translate="label" type="select" 
@@ -76,7 +79,7 @@
                     <comment>This status will be applied if NoFraud responds with an error message instead of a pass/review/fail decision.</comment>
                     <source_model>NoFraud\Checkout\Model\Config\Source\NoFraudStatus</source_model>
                 </field>
-            </group>
+            </group> -->
             <group id="advance" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Advanced Nofraud Checkout Settings</label>
                 <field id="list_mode" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
