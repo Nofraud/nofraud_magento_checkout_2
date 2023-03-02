@@ -5,6 +5,9 @@ namespace NoFraud\Checkout\Model;
 use NoFraud\Checkout\Api\SetPaymentmode;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\PageCache\Version;
+use Magento\Framework\App\Cache\TypeListInterface;
+use Magento\Framework\App\Cache\Frontend\Pool;
 
 class SetPaymentmodeData implements SetPaymentmode
 {
@@ -12,10 +15,20 @@ class SetPaymentmodeData implements SetPaymentmode
 
     protected $configWriter;
 
+    protected $cacheTypeList;
+
+    protected $cacheFrontendPool;
+
     const PAYMENT_ACTION = "nofraud/advance/payment_action";
 
-    public function __construct(WriterInterface $configWriter) {
-        $this->configWriter = $configWriter;
+    public function __construct(
+        WriterInterface $configWriter,
+        TypeListInterface $cacheTypeList,
+        Pool $cacheFrontendPool
+    ) {
+        $this->configWriter         = $configWriter;
+        $this->cacheTypeList        = $cacheTypeList;
+        $this->cacheFrontendPool    = $cacheFrontendPool;
     }
 
     /**
@@ -44,7 +57,7 @@ class SetPaymentmodeData implements SetPaymentmode
                 }else{
                     $this->SetData(self::PAYMENT_ACTION, "authorize_capture");
                 }
-
+                $this->flushCache();
                 $response = [
                     [
                         "code" => 'success',
@@ -61,5 +74,29 @@ class SetPaymentmodeData implements SetPaymentmode
             }
         }
         return $response;
+    }
+
+    public function flushCache() {
+        $_types = [
+            'config',
+            'layout',
+            'block_html',
+            'collections',
+            'reflection',
+            'db_ddl',
+            'eav',
+            'config_integration',
+            'config_integration_api',
+            'full_page',
+            'translate',
+            'config_webservice'
+        ];
+
+        foreach ($_types as $type) {
+            $this->cacheTypeList->cleanType($type);
+        }
+        foreach ($this->cacheFrontendPool as $cacheFrontend) {
+            $cacheFrontend->getBackend()->clean();
+        }
     }
 }
