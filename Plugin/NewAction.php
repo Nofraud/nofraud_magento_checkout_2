@@ -52,7 +52,7 @@ class NewAction
     {
         $orderId = $subject->getRequest()->getParam('order_id');
         try {
-            $order          = $this->orderRepository->get($orderId);
+            $order         = $this->orderRepository->get($orderId);
             $authorizedId  = $this->getOrderAuthorizedId($order);
             if($authorizedId) {
                 $this->captureNofraudTranscation($authorizedId);

@@ -90,6 +90,7 @@
                     <label>Payment Action</label>
                     <source_model>NoFraud\Checkout\Model\Config\Source\PaymentAction</source_model>
                     <config_path>nofraud/advance/payment_action</config_path>
+                    <frontend_model>NoFraud\Checkout\Block\Adminhtml\System\Config\Form\Field\Disable</frontend_model>
                 </field>
             </group>
         </section>
