@@ -4,6 +4,9 @@ namespace NoFraud\Checkout\Model;
 use NoFraud\Checkout\Api\SetConfiguration;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\PageCache\Version;
+use Magento\Framework\App\Cache\TypeListInterface;
+use Magento\Framework\App\Cache\Frontend\Pool;
 
 class SetConfigurationData implements SetConfiguration
 {
@@ -11,14 +14,24 @@ class SetConfigurationData implements SetConfiguration
 
     protected $configWriter;
 
+    protected $cacheTypeList;
+
+    protected $cacheFrontendPool;
+
     const ENABLED = "nofraud/general/enabled";
 
     const MERCHANT_Id = "nofraud/general/merchant";
 
     const NF_TOKEN    = "nofraud/general/nf_token";
 
-    public function __construct(WriterInterface $configWriter) {
-        $this->configWriter = $configWriter;
+    public function __construct(
+    WriterInterface $configWriter,
+    TypeListInterface $cacheTypeList,
+    Pool $cacheFrontendPool
+    ) {
+        $this->configWriter         = $configWriter;
+        $this->cacheTypeList        = $cacheTypeList;
+        $this->cacheFrontendPool    = $cacheFrontendPool;
     }
 
     /**
@@ -51,7 +64,7 @@ class SetConfigurationData implements SetConfiguration
                 }
                 $this->SetData(self::MERCHANT_Id, $merchant_id);
                 $this->SetData(self::NF_TOKEN, $nf_token);
-
+                $this->flushCache();
                 $response = [
                     [
                         "code" => 'success',
@@ -68,5 +81,29 @@ class SetConfigurationData implements SetConfiguration
             }
         }
         return $response;
+    }
+
+    public function flushCache() {
+        $_types = [
+            'config',
+            'layout',
+            'block_html',
+            'collections',
+            'reflection',
+            'db_ddl',
+            'eav',
+            'config_integration',
+            'config_integration_api',
+            'full_page',
+            'translate',
+            'config_webservice'
+        ];
+
+        foreach ($_types as $type) {
+            $this->cacheTypeList->cleanType($type);
+        }
+        foreach ($this->cacheFrontendPool as $cacheFrontend) {
+            $cacheFrontend->getBackend()->clean();
+        }
     }
 }
