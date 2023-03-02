@@ -18,13 +18,13 @@
 			<resource ref="anonymous" />
 		</resources>
 	</route>
-	<route method="GET" url="/V1/nofraudcheckout/fetchstorecredit">
+	<route url="/V1/nofraudcheckout/fetchstorecredit" method="GET">
         <service class="NoFraud\Checkout\Api\StoreCreditInterface" method="getstoreCreditByCustomerId"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>
     </route>
-	<route url="/V1/nofraudcheckout/fetchgiftcard" method="GET">
+	<route url="/V1/nofraudcheckout/fetchgiftcard" method="POST">
         <service class="NoFraud\Checkout\Api\GiftCardAccountRepositoryInterface" method="getCertificateDetails"/>
         <resources>
             <resource ref="anonymous" />
