@@ -128,7 +128,11 @@ define([
 	        $('[data-block="minicart"]').find('[data-role="dropdownDialog"]').dropdownDialog('close');
 	    },
 
-        openPopup: function () { 
+        /**
+         *  Open iframe from the nofraud
+         * @param paymentName
+         */
+        openPopup: function (paymentName=null) {
 			var cartData        = customerData.get('cart');
 			var customer        = customerData.get('customer');
             var cartId          = customerData.get('nofrudcheckout')().quote_id;
@@ -148,6 +152,9 @@ define([
                     params['currencyCode'] = currencyCode;
                     params['languageCode'] = languageCode;
                     params['storeCode'] = storeCode;
+                    if(paymentName != null && typeof paymentName === 'string'){
+                        params['paymentName'] = paymentName;
+                    }
                     console.log(params);
                     nfOpenCheckout(params);
                 //}
