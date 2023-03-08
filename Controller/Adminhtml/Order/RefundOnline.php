@@ -114,7 +114,7 @@ class RefundOnline extends \Magento\Backend\App\Action
                 CURLOPT_POSTFIELDS => json_encode($data),
                 CURLOPT_HTTPHEADER => array(
                     "Content-Type: application/json",
-                    "X-NF-HOOK-AUTH: {$apikey}"
+                    "x-nf-api-token: {$apikey}"
                 ),
             ));
             $response = curl_exec($curl);
