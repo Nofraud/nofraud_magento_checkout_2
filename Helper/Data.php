@@ -23,7 +23,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     const PROD_REFUND_API_URL = "https://dynamic-api-checkout.nofraud.com/api/v2/hooks/refund/";
 
     //const STAG_REFUND_API_URL = "https://dynamic-checkout-api-staging2.nofraud-test.com/api/v1/hooks/refund/";
-    const STAG_REFUND_API_URL = "https://dynamic-checkout-api-qe2.nofraud-test.com/api/v2/hooks/refund/";
+    const STAG_REFUND_API_URL = "https://dynamic-api-checkout-qe2.nofraud-test.com/api/v2/hooks/refund/";
 
     const DEV_REFUND_API_URL = "https://dynamic-checkout-api-staging2.nofraud-test.com/api/v2/hooks/refund/";
 
@@ -203,10 +203,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     */
     public function getRefundApiKey()
     {
-        return $this->scopeConfig->getValue(
+        /*return $this->scopeConfig->getValue(
             'nofraud/general/api_key',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
+        );*/
+        return $this->getNofrudCheckoutAppNfToken();
     }
 
     /**
