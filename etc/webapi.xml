@@ -3,49 +3,49 @@
     <route url="/V1/getproductimage/:sku" method="GET">
 		<service class="NoFraud\Checkout\Api\GetProductImage" method="getProductImageUrl" />
 		<resources>
-			 <resource ref="anonymous" />
+			 <resource ref="self" />
 		</resources>
 	</route>
       <route url="/V1/nofraudcheckout/updateorder" method="POST">
 		<service class="NoFraud\Checkout\Api\SetOrderAttributes" method="updateOrderAttributes" />
 		<resources>
-			 <resource ref="anonymous" />
+			 <resource ref="self" />
 		</resources>
 	</route>
 	<route url="/V1/nofraudcheckout/initialize" method="POST">
 		<service class="NoFraud\Checkout\Api\SetConfiguration" method="enableConfiguration" />
 		<resources>
-			<resource ref="anonymous" />
+			<resource ref="self"/>	
 		</resources>
 	</route>
 	<route url="/V1/nofraudcheckout/fetchstorecredit" method="GET">
         <service class="NoFraud\Checkout\Api\StoreCreditInterface" method="getstoreCreditByCustomerId"/>
         <resources>
-            <resource ref="anonymous"/>
+            <resource ref="self"/>
         </resources>
     </route>
 	<route url="/V1/nofraudcheckout/fetchgiftcard" method="POST">
         <service class="NoFraud\Checkout\Api\GiftCardAccountRepositoryInterface" method="getCertificateDetails"/>
         <resources>
-            <resource ref="anonymous" />
+            <resource ref="self" />
         </resources>
     </route>
 	<route url="/V1/nofraudcheckout/carts/gift-card/add" method="PUT">
         <service class="NoFraud\Checkout\Api\GiftCardAccountManagementInterface" method="applyGiftCardToCart"/>
         <resources>
-            <resource ref="anonymous" />
+            <resource ref="self" />
         </resources>
     </route>
 	<route url="/V1/nofraudcheckout/carts/gift-card/remove" method="PUT">
         <service class="NoFraud\Checkout\Api\GiftCardAccountManagementInterface" method="removeGiftCardFromCart"/>
         <resources>
-            <resource ref="anonymous" />
+            <resource ref="self" />
         </resources>
     </route>
     <route url="/V1/nofraudcheckout/paymentmode" method="POST">
 		<service class="NoFraud\Checkout\Api\SetPaymentmode" method="paymentmodeConfiguration" />
 		<resources>
-			<resource ref="anonymous" />
+			<resource ref="self" />
 		</resources>
 	</route>
 </routes>
