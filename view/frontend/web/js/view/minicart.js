@@ -76,6 +76,35 @@ define([
         initSidebar();
     });
 
+    $('body').on("click", '.iframebasedpayment', function() {
+        var paymentName     = $(this).data('payment');
+        var cartData        = customerData.get('cart');
+        var customer        = customerData.get('customer');
+        var cartId          = customerData.get('nofrudcheckout')().quote_id;
+        var currencyCode    = customerData.get('nofrudcheckout')().currencycode;
+        var languageCode    = customerData.get('nofrudcheckout')().languagecode;
+        var storeCode       = customerData.get('nofrudcheckout')().storecode;
+
+        if(cartId){
+                $('[data-block="minicart"]').find('[data-role="dropdownDialog"]').dropdownDialog('close');
+                var params = [];
+                params['data-nf-access-token'] = customer().fullname && customer().firstname ? window.nofraudcheckout_accesstokenforcustomer : window.nofraudcheckout_accesstokenfornotlogin;
+                params['data-nf-cart-id'] = cartId;
+                params['data-nf-customer-is-logged-in'] = customer().fullname && customer().firstname ? 1 : 0;
+                params['data-nf-merchant-id'] = window.nofraudcheckout_merchant;
+                params['data-nf-store-url'] = BASE_URL;
+                params['currencyCode'] = currencyCode;
+                params['languageCode'] = languageCode;
+                params['storeCode'] = storeCode;
+                if(paymentName != null && typeof paymentName === 'string'){
+                    params['paymentName'] = paymentName;
+                }
+                console.log(params);
+                nfOpenCheckout(params);
+        }     
+    });
+
+
     return Component.extend({
         shoppingCartUrl: window.checkout.shoppingCartUrl,
         maxItemsToDisplay: window.checkout.maxItemsToDisplay,
