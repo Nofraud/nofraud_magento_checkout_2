@@ -50,24 +50,29 @@ class NewAction
 
     public function beforeExecute(\Magento\Sales\Controller\Adminhtml\Order\Invoice\NewAction $subject)
     {
-        $orderId = $subject->getRequest()->getParam('order_id');
-        try {
-            $order         = $this->orderRepository->get($orderId);
-            $authorizedId  = $this->getOrderAuthorizedId($order);
-            if($authorizedId) {
-                $this->captureNofraudTranscation($authorizedId);
+        $merchantPreferences = $this->getNofraudSettings();
+        $manualCapture       = $merchantPreferences['settings']['manualCapture']['isEnabled'] ?? false;
+        error_log(print_r($merchantPreferences['settings']['manualCapture'],true),3,BP."/var/log/new_action.log");
+        if (!empty($manualCapture) && $manualCapture === true) {
+            $orderId = $subject->getRequest()->getParam('order_id');
+            try {
+                $order         = $this->orderRepository->get($orderId);
+                $authorizedId  = $this->getOrderAuthorizedId($order);
+                if($authorizedId) {
+                    $this->captureNofraudTranscation($authorizedId);
+                    throw new \Magento\Framework\Exception\LocalizedException(
+                        __('Authrozied Id.' . $authorizedId)
+                    );
+                }
                 throw new \Magento\Framework\Exception\LocalizedException(
-                    __('Authrozied Id.' . $authorizedId)
+                    __('The order does not allow an invoice to be created.')
                 );
+            } catch (\Exception $e) {
+                $this->messageManager->addErrorMessage($e->getMessage());
+                $this->_redirectToOrderPage($orderId);
             }
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __('The order does not allow an invoice to be created.')
-            );
-        } catch (\Exception $e) {
-            $this->messageManager->addErrorMessage($e->getMessage());
-            $this->_redirectToOrderPage($orderId);
+            return null;
         }
-        return null;
     }
 
     /**
@@ -152,6 +157,37 @@ class NewAction
             }
         } catch(\Exception $e) {
             $this->messageManager->addErrorMessage($e->getMessage());
+        }
+    }
+
+    private function getNofraudSettings() 
+    {
+        $nfToken    = $this->checkoutHelper->getNofrudCheckoutAppNfToken();
+        $merchantId = $this->checkoutHelper->getMerchantId();
+        $apiUrl     = $this->checkoutHelper->getNofraudMerSettings().$merchantId;
+        error_log("\n order place time manual capture check ".$apiUrl,3,BP."/var/log/new_action.log");
+        try {
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => $apiUrl,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'GET',
+                CURLOPT_HTTPHEADER => array(
+                    "Content-Type: application/json",
+                    "x-nf-api-token:{$nfToken}"
+                ),
+            ));
+            $response = curl_exec($curl);
+            curl_close($curl);
+            $responseArray = json_decode($response, true);
+            return $responseArray;
+        } catch(\Exception $e) {
+            error_log("\n order place time manual capture check ".$e->getMessage(),3,BP."/var/log/new_action.log");
         }
     }
 }
