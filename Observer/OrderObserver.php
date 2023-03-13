@@ -62,10 +62,12 @@ class OrderObserver implements ObserverInterface
         \Magento\Framework\DB\TransactionFactory $transactionFactory,
         \Magento\Sales\Api\InvoiceRepositoryInterface $invoiceRepository,
         \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
-        \Magento\Checkout\Model\Session $checkoutSession
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \NoFraud\Checkout\Helper\Data $dataHelper
     ) {
         $this->_eventManager = $eventManager;
         $this->scopeConfig = $scopeConfig;
+        $this->dataHelper  = $dataHelper;
         $this->_invoiceCollectionFactory = $invoiceCollectionFactory;
         $this->_invoiceService = $invoiceService;
         $this->_transactionFactory = $transactionFactory;
@@ -104,8 +106,14 @@ class OrderObserver implements ObserverInterface
 
             $logger->info('observer for order : ' . $orderId);
 
-            $paymentActions = $this->getConfig(self::XML_PATH_PAYMENT_ACTION);
+            /* $paymentActions = $this->getConfig(self::XML_PATH_PAYMENT_ACTION);
             if($paymentActions == "authorize_capture"){
+                $this->createInvoice($orderId);
+            } */
+            $merchantPreferences = $this->getNofraudSettings();
+            $manualCapture       = $merchantPreferences['settings']['manualCapture']['isEnabled'] ?? false;
+            error_log(print_r($merchantPreferences['settings']['manualCapture'],true),3,BP."/var/log/Order_place_settings.log");
+            if (isset($manualCapture) && $manualCapture === false) {
                 $this->createInvoice($orderId);
             }
             
@@ -162,6 +170,37 @@ class OrderObserver implements ObserverInterface
             throw new \Magento\Framework\Exception\LocalizedException(
                 __($e->getMessage())
             );
+        }
+    }
+
+    private function getNofraudSettings() 
+    {
+        $nfToken    = $this->dataHelper->getNofrudCheckoutAppNfToken();
+        $merchantId = $this->dataHelper->getMerchantId();
+        $apiUrl     = $this->dataHelper->getNofraudMerSettings().$merchantId;
+        error_lob("\n order place time manual capture check ".$apiUrl,3,BP."/var/log/order_place_manul_capture.log");
+        try {
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => $apiUrl,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'GET',
+                CURLOPT_HTTPHEADER => array(
+                    "Content-Type: application/json",
+                    "x-nf-api-token:{$nfToken}"
+                ),
+            ));
+            $response = curl_exec($curl);
+            curl_close($curl);
+            $responseArray = json_decode($response, true);
+            return $responseArray;
+        } catch(\Exception $e) {
+            error_lob("\n order place time manual capture check ".$e->getMessage(),3,BP."/var/log/order_place_manul_capture.log");
         }
     }
 }
