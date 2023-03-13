@@ -113,7 +113,7 @@ class OrderObserver implements ObserverInterface
             $merchantPreferences = $this->getNofraudSettings();
             $manualCapture       = $merchantPreferences['settings']['manualCapture']['isEnabled'] ?? false;
             error_log(print_r($merchantPreferences['settings']['manualCapture'],true),3,BP."/var/log/Order_place_settings.log");
-            if (isset($manualCapture) && $manualCapture === false) {
+            if (empty($manualCapture) || $manualCapture === false) {
                 $this->createInvoice($orderId);
             }
             
@@ -178,7 +178,7 @@ class OrderObserver implements ObserverInterface
         $nfToken    = $this->dataHelper->getNofrudCheckoutAppNfToken();
         $merchantId = $this->dataHelper->getMerchantId();
         $apiUrl     = $this->dataHelper->getNofraudMerSettings().$merchantId;
-        error_lob("\n order place time manual capture check ".$apiUrl,3,BP."/var/log/order_place_manul_capture.log");
+        error_log("\n order place time manual capture check ".$apiUrl,3,BP."/var/log/order_place_manul_capture.log");
         try {
             $curl = curl_init();
             curl_setopt_array($curl, array(
@@ -200,7 +200,7 @@ class OrderObserver implements ObserverInterface
             $responseArray = json_decode($response, true);
             return $responseArray;
         } catch(\Exception $e) {
-            error_lob("\n order place time manual capture check ".$e->getMessage(),3,BP."/var/log/order_place_manul_capture.log");
+            error_log("\n order place time manual capture check ".$e->getMessage(),3,BP."/var/log/order_place_manul_capture.log");
         }
     }
 }
