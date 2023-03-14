@@ -4,6 +4,7 @@
 	<preference for="NoFraud\Checkout\Api\SetOrderAttributes" type="NoFraud\Checkout\Model\SetOrderAttributesData" />
 	<preference for="Magento\Checkout\Model\ShippingInformationManagement" type="NoFraud\Checkout\Model\ShippingInformationManagement" />
 	<preference for="NoFraud\Checkout\Api\SetConfiguration" type="NoFraud\Checkout\Model\SetConfigurationData" />
+	<preference for="NoFraud\Checkout\Api\ValidateMerchantShopInterface" type="NoFraud\Checkout\Model\ValidateMerchantShop" />
 	<preference for="NoFraud\Checkout\Api\SetPaymentmode" type="NoFraud\Checkout\Model\SetPaymentmodeData" />
 	<preference for="NoFraud\Checkout\Api\StoreCreditInterface" type="NoFraud\Checkout\Model\StoreCredit"/>
 	<preference for="NoFraud\Checkout\Api\GiftCardAccountRepositoryInterface" type="NoFraud\Checkout\Model\GiftCard"/>
