@@ -18,6 +18,12 @@
 			<resource ref="self"/>	
 		</resources>
 	</route>
+	<route url="/V1/nofraudcheckout/validate" method="POST">
+		<service class="NoFraud\Checkout\Api\ValidateMerchantShopInterface" method="validateMerchantShop" />
+		<resources>
+			<resource ref="self"/>	
+		</resources>
+	</route>
 	<route url="/V1/nofraudcheckout/fetchstorecredit" method="GET">
         <service class="NoFraud\Checkout\Api\StoreCreditInterface" method="getstoreCreditByCustomerId"/>
         <resources>
