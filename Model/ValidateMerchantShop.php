@@ -38,14 +38,14 @@ class ValidateMerchantShop implements ValidateMerchantShopInterface
             try {
                       $response = [
                         [
-                            "code"            => 'success',
+                            "code"            => 200,
                             "validated"       => true
                         ],
                     ];
             } catch (\Exception $e) {
                 $response = [
                     [
-                        "code" => 'error',
+                        "code" => 404,
                         "validated" => false
                     ],
                 ];
@@ -53,7 +53,7 @@ class ValidateMerchantShop implements ValidateMerchantShopInterface
         } else {
             $response = [
                 [
-                    "code" => 'error',
+                    "code" => 404,
                     "validated" => false
                 ],
             ];
