@@ -55,10 +55,9 @@ class SetConfigurationData implements SetConfiguration
 
         $enabled        = $data["enabled"];
         $merchant_id    = $data["merchant_id"];
-        $api_key        = $data["api_key"];
         $nf_token       = $data["nf_token"];
 
-        if (isset($enabled) && isset($merchant_id) && isset($nf_token) && isset($api_key)) {
+        if (isset($enabled) && isset($merchant_id) && isset($nf_token)) {
             try {
                 if($enabled == true){
                     $this->SetData(self::ENABLED, 1);
@@ -66,13 +65,12 @@ class SetConfigurationData implements SetConfiguration
                     $this->SetData(self::ENABLED, 0);
                 }
                 $this->SetData(self::MERCHANT_Id, $merchant_id);
-                $this->SetData(self::API_KEY, $api_key);
                 $this->SetData(self::NF_TOKEN, $nf_token);
                 $this->flushCache();
                 $response = [
                     [
                         "code" => 'success',
-                        "message" => 'Extension, Merchant Id, Api key and Nf Token updated successfully !',
+                        "message" => 'Extension, Merchant Id and Nf Token updated successfully !',
                     ],
                 ];
             }catch(\Exception $e) {
