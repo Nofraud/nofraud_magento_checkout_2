@@ -251,10 +251,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
      */
     public function getCaptureApiKey()
     {
-        return $this->scopeConfig->getValue(
+        /*return $this->scopeConfig->getValue(
             'nofraud/general/api_key',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
+        );*/
+	return $this->getNofrudCheckoutAppNfToken();
     }
 
     /**

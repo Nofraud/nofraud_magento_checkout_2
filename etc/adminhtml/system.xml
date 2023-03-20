@@ -32,11 +32,11 @@
                     <comment><![CDATA[Don't have an account? Please <a href="https://portal.nofraud.com" target="_blank"> click here</a> to create one.]]></comment>
                     <frontend_model>NoFraud\Checkout\Block\Adminhtml\System\Config\Form\Field\Disable</frontend_model>
                 </field>
-                <field id="api_key" translate="label" type="obscure" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1">
+		<!-- <field id="api_key" translate="label" type="obscure" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>API Key</label>
                     <validate>required-entry</validate>
                     <frontend_model>NoFraud\Checkout\Block\Adminhtml\System\Config\Form\Field\Disable</frontend_model>
-                </field>
+                </field> -->
                 <field id="nf_token" translate="label" type="text" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>NF Token</label>
                     <validate>required-entry</validate>
