@@ -56,6 +56,7 @@ class OrderObserver implements ObserverInterface
      */
     public function __construct(
         EventManager $eventManager,
+        \Magento\Framework\Webapi\Rest\Request $restApiRequest,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Sales\Model\ResourceModel\Order\Invoice\CollectionFactory $invoiceCollectionFactory,
         \Magento\Sales\Model\Service\InvoiceService $invoiceService,
@@ -66,6 +67,7 @@ class OrderObserver implements ObserverInterface
         \NoFraud\Checkout\Helper\Data $dataHelper
     ) {
         $this->_eventManager = $eventManager;
+        $this->restApiRequest = $restApiRequest;
         $this->scopeConfig = $scopeConfig;
         $this->dataHelper  = $dataHelper;
         $this->_invoiceCollectionFactory = $invoiceCollectionFactory;
@@ -88,8 +90,8 @@ class OrderObserver implements ObserverInterface
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         $isNofraudenabled = (int) $this->getConfig(self::XML_PATH_ENABLED);
-
-        if ($isNofraudenabled) {
+      
+        if ($isNofraudenabled && strpos($this->restApiRequest->getRequestUri(),"/order") !== false) {
             $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/custom.log');
             $logger = new \Zend_Log();
             $logger->addWriter($writer);
@@ -110,6 +112,7 @@ class OrderObserver implements ObserverInterface
             if($paymentActions == "authorize_capture"){
                 $this->createInvoice($orderId);
             } */
+
             $merchantPreferences = $this->getNofraudSettings();
             $manualCapture       = $merchantPreferences['settings']['manualCapture']['isEnabled'] ?? false;
             error_log(print_r($merchantPreferences['settings']['manualCapture'],true),3,BP."/var/log/Order_place_settings.log");
