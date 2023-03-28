@@ -24,13 +24,7 @@ class OrderFraudStatus
 
     private $storeManager;
 
-    private $requestHandler;
-
     private $configHelper;
-
-    private $apiUrl;
-
-    private $orderProcessor;
 
     private $moduleManager;
 
@@ -45,10 +39,7 @@ class OrderFraudStatus
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orders,
         \Magento\Sales\Model\ResourceModel\Order\Status\CollectionFactory $orderStatusCollection,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \NoFraud\Connect\Api\RequestHandler $requestHandler,
         \NoFraud\Checkout\Helper\Data $dataHelper,
-        \NoFraud\Connect\Api\ApiUrl $apiUrl,
-        \NoFraud\Connect\Order\Processor $orderProcessor,
         \Magento\Framework\Module\Manager $moduleManager,
         \Magento\Sales\Model\Order\Invoice $invoice,
         \Magento\Sales\Model\Order\CreditmemoFactory $creditMemoFacory,
@@ -58,10 +49,7 @@ class OrderFraudStatus
         $this->orders                   = $orders;
         $this->orderStatusCollection    = $orderStatusCollection;
         $this->storeManager             = $storeManager;
-        $this->requestHandler           = $requestHandler;
         $this->dataHelper               = $dataHelper;
-        $this->apiUrl                   = $apiUrl;
-        $this->orderProcessor           = $orderProcessor;
         $this->moduleManager            = $moduleManager;
         $this->invoice                  = $invoice;
         $this->creditMemoFacory         = $creditMemoFacory;
