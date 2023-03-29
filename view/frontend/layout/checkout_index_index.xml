@@ -38,5 +38,8 @@
                 </argument>
             </arguments>
         </referenceBlock>
+        <referenceContainer name="content">
+            <block class="NoFraud\Checkout\Block\CheckoutContent" name="nofraud.checkout.content" template="NoFraud_Checkout::checkoutcontent.phtml" cacheable="false"></block>
+        </referenceContainer>
     </body>
 </page>
