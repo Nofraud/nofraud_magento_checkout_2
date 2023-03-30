@@ -15,7 +15,4 @@
     <event name="admin_system_config_changed_section_nofraud">
         <observer name="nofraud_admin_system_config_changed_section_nofraud" instance="NoFraud\Checkout\Observer\ConfigChangeObserver"/>
     </event>
-    <event name="payment_method_is_active">
-        <observer name="nofraud_payment_method_disable" instance="NoFraud\Checkout\Observer\DisablePaymentMethod" />
-    </event>
 </config>
