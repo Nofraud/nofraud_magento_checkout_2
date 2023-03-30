@@ -1,6 +1,6 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceBlock name="checkout.root">
+       <!--  <referenceBlock name="checkout.root">
             <arguments>
                 <argument name="jsLayout" xsi:type="array">
                     <item name="components" xsi:type="array">
@@ -14,9 +14,7 @@
                                                 <item name="payment" xsi:type="array">
                                                     <item name="children" xsi:type="array">
                                                         <item name="renders" xsi:type="array">
-                                                            <!-- merge payment method renders here -->
-                                                            <item name="children" xsi:type="array">
-                                                                <item name="nofraud" xsi:type="array">
+                                                                                                                					<item name="children" xsi:type="array">                                                                <item name="nofraud" xsi:type="array">
                                                                     <item name="component" xsi:type="string">NoFraud_Checkout/js/view/payment/method-renderer</item>
                                                                     <item name="methods" xsi:type="array">
                                                                         <item name="nofraud" xsi:type="array">
@@ -37,7 +35,7 @@
                     </item>
                 </argument>
             </arguments>
-        </referenceBlock>
+        </referenceBlock> -->
         <referenceContainer name="content">
             <block class="NoFraud\Checkout\Block\CheckoutContent" name="nofraud.checkout.content" template="NoFraud_Checkout::checkoutcontent.phtml" cacheable="false"></block>
         </referenceContainer>
