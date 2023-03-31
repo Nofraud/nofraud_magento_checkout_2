@@ -9,7 +9,7 @@ plugins:
   - assets:
     - CHANGELOG.md
 branches:
-  - "production"
+  - "main"
   - "+([0-9])?(.{+([0-9]),x}).x"
   - name: "alpha"
     prerelease: "alpha"
