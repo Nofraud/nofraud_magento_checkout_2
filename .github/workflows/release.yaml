@@ -1,4 +1,4 @@
-æname: Release
+name: Release
 on:
   push:
     branches:
