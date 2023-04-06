@@ -299,11 +299,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
         $checkoutMode = $this->getNofraudAdvanceListMode();
         $merchantId   = $this->getMerchantId();
         if (strcmp($checkoutMode, "prod") === 0) {
-            return self::PROD_CHECKOUT_API_BASE_URL . "/api/v1/merchants/".$merchantId."/scripts.js";
+            return self::PROD_CHECKOUT_API_BASE_URL."/api/v1/merchants/".$merchantId."/script.js";
         } elseif (strcmp($checkoutMode, "stag") === 0) {
-            return self::STAG_CHECKOUT_API_BASE_URL . "/api/v1/merchants/".$merchantId."/scripts.js";
+            return self::STAG_CHECKOUT_API_BASE_URL."/api/v1/merchants/".$merchantId."/script.js";
         } elseif (strcmp($checkoutMode, "dev") === 0) {
-            return self::DEV_CHECKOUT_API_BASE_URL . "/api/v1/merchants/".$merchantId."/scripts.js";
+            return self::DEV_CHECKOUT_API_BASE_URL."/api/v1/merchants/".$merchantId."/script.js";
         }
     }
 
