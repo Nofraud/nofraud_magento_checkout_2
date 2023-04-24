@@ -15,13 +15,15 @@
         <table name="sales_order" resource="sales" engine="innodb" comment="Sales Flat Order">
                 <column xsi:type="boolean" name="nofraud_checkout_screened" nullable="false" 
                 default="0" comment="NoFraud Checkout screened order flag"/>
-                <column xsi:type="text" name="nofraud_checkout_status" nullable="false" 
+                <column xsi:type="varchar" name="nofraud_checkout_status" nullable="false" length="255"
                 comment="NoFraud Checkout screened order status"/>
+                <column xsi:type="text" name="nofraudcheckout" comment="NoFraudCheckout"/>
         </table>
         <table name="sales_order_grid" resource="sales" engine="innodb" comment="Sales Flat Order Grid">
                 <column xsi:type="boolean" name="nofraud_checkout_screened" nullable="false" 
                 default="0" comment="NoFraud Checkout screened order flag"/>
-                <column xsi:type="text" name="nofraud_checkout_status" nullable="false" 
+                <column xsi:type="varchar" name="nofraud_checkout_status" nullable="false" length="255"
                 comment="NoFraud Checkout screened order status"/>
+                <column xsi:type="text" name="nofraudcheckout" comment="NoFraudCheckout"/>
         </table>
  </schema>
