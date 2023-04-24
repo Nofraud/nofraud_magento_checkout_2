@@ -8,6 +8,9 @@
     <action name="checkout/cart/add">
         <section name="nofrudcheckout"/>
     </action>
+    <action name="matrixview/cart/add">
+        <section name="nofrudcheckout"/>
+    </action>
     <action name="checkout/cart/delete">
         <section name="nofrudcheckout"/>
     </action>

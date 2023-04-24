@@ -11,7 +11,7 @@
             <label>Checkout</label>
             <!-- Assign section to tab -->
             <tab>nofraud</tab>
-            <resource>NoFraud_Checkout::custom</resource>
+            <resource>NoFraud_Checkout::config</resource>
             <!-- create group for fields in section -->
             <group id="general" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>General Options</label>
