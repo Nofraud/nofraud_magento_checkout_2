@@ -16,5 +16,6 @@ repos:
             perf,
             refactor,
             revert,
+            wip,
             style,
           ] # optional: list of Conventional Commits types to allow
