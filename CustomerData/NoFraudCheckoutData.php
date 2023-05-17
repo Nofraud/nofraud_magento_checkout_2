@@ -116,7 +116,7 @@ class NoFraudCheckoutData extends \Magento\Framework\DataObject implements Secti
     * @return string
     */
     public function getCurrentLocale(){
-        $currentLocaleCode = $this->localeResolver->getLocale(); // fr_CA
+        $currentLocaleCode = $this->localeResolver->getLocale(); 
         $languageCode = strstr($currentLocaleCode, '_', true);
         return $languageCode;
     }

@@ -251,7 +251,7 @@ class OrderFraudStatus
                                     $newStatus  =  "Pending Payment";
                                     $newState   =  "payment_review";
                                     error_log("\n status ".$newStatus." <=> ".$order->getId(),3,BP."/var/log/cron_review.log");
-                                    $order->setStatus($newStatus)->setState($newState);
+                                    //$order->setStatus($newStatus)->setState($newState);
                                     $order->setNofraudCheckoutStatus($noFraudStatus);
                                     $order->save();
                                 }

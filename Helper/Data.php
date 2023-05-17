@@ -63,7 +63,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     const STAG_NFAPI_STATUS_BASE_URL = "https://api-qe2.nofraud-test.com/status_by_url/";
     const DEV_NFAPI_STATUS_BASE_URL  = "https://api-qe2.nofraud-test.com/status_by_url/";
 
-   
+    /* 
+    * Payment Button APP BASE URLS 
+    **/
+    const PROD_PAYMENT_APP_BASE_URL = "https://cdn-checkout.nofraud.com/";
+    const STAG_PAYMENT_APP_BASE_URL = "https://cdn-checkout-qe2.nofraud-test.com/";
+    const DEV_PAYMENT_APP_BASE_URL  = "https://dynamic-checkout-test.nofraud-test.com/latest/";
+
     const ORDER_STATUSES = 'nofraud/order_statuses';
 
     public function __construct(
@@ -283,5 +289,36 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
             $value = $this->scopeConfig->getValue($path);
         }
         return $value;
+    }
+
+    /**
+    * get Payment Button API Source JS URL
+    */
+    public function getPaymentButtonScriptApiSourceJs()
+    {
+        $checkoutMode = $this->getNofraudAdvanceListMode();
+        $merchantId   = $this->getMerchantId();
+        if (strcmp($checkoutMode, "prod") === 0) {
+            return self::PROD_CHECKOUT_API_BASE_URL."/api/v1/merchants/".$merchantId."/script.js";
+        } elseif (strcmp($checkoutMode, "stag") === 0) {
+            return self::STAG_CHECKOUT_API_BASE_URL."/api/v1/merchants/".$merchantId."/script.js";
+        } elseif (strcmp($checkoutMode, "dev") === 0) {
+            return self::DEV_CHECKOUT_API_BASE_URL."/api/v1/merchants/".$merchantId."/script.js";
+        }
+    }
+
+    /**
+    * get Payment Button APP Source JS URL
+    */
+    public function getPaymentButtonMagentoAppSourceJs()
+    {
+        $checkoutMode = $this->getNofraudAdvanceListMode();
+        if (strcmp($checkoutMode, "prod") === 0) {
+            return self::PROD_PAYMENT_APP_BASE_URL . "payment-options/scripts/magento.js";
+        } elseif (strcmp($checkoutMode, "stag") === 0) {
+            return self::STAG_PAYMENT_APP_BASE_URL . "payment-options/scripts/magento.js";
+        } elseif (strcmp($checkoutMode, "dev") === 0) {
+            return self::DEV_PAYMENT_APP_BASE_URL . "payment-options/scripts/magento.js";
+        }
     }
 }

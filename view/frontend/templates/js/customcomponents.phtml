@@ -1,9 +1,10 @@
 <script  type="text/javascript"  src="<?php echo $this->helper('NoFraud\Checkout\Helper\Data')->getApiSourceJs() ?>"></script>
+<script  type="text/javascript"  src="<?php echo $this->helper('NoFraud\Checkout\Helper\Data')->getPaymentButtonScriptApiSourceJs() ?>"></script>
+<script  type="text/javascript"  src="<?php echo $this->helper('NoFraud\Checkout\Helper\Data')->getPaymentButtonMagentoAppSourceJs() ?>"></script>
 <script>
 	window.nofraudcheckout_merchant = "<?php echo $this->helper('NoFraud\Checkout\Helper\Data')->getMerchantId() ?>";
 	window.nofraudcheckout_accesstokenfornotlogin = "";
 	window.nofraudcheckout_accesstokenforcustomer = "<?php echo $block->getCustomerToken(); ?>";
 	window.nofraudcheckout_firstload = 0;
-	
 	console.log('init :' + window.nofraudcheckout_firstload);
 </script>
