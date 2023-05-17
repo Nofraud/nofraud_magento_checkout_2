@@ -24,7 +24,7 @@
 			<resource ref="self"/>	
 		</resources>
 	</route>
-	<route url="/V1/nofraudcheckout/fetchstorecredit" method="GET">
+	<route url="/V1/nofraudcheckout/fetchstorecredit" method="POST">
         <service class="NoFraud\Checkout\Api\StoreCreditInterface" method="getstoreCreditByCustomerId"/>
         <resources>
             <resource ref="self"/>
