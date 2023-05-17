@@ -10,6 +10,8 @@ class ConfigChangeObserver implements ObserverInterface
 {
     const XML_PATH_TELEPHONE_SHOW = 'customer/address/telephone_show';
 
+    const XML_PATH_OAUTH_CONSUMER_ENABLE = 'oauth/consumer/enable_integration_as_bearer';
+
     protected $scopeConfig;
 
     /**
@@ -32,7 +34,8 @@ class ConfigChangeObserver implements ObserverInterface
 
         if ($Showtelephone != 'opt') {
             $this->configWriter->save(self::XML_PATH_TELEPHONE_SHOW, 'opt');
-            return $this;
+            $this->configWriter->save(self::XML_PATH_OAUTH_CONSUMER_ENABLE, '1');
+	    return $this;
         }
     }
 }

@@ -3,32 +3,20 @@
     <policies>
         <policy id="script-src">
             <values>
-                <value id="stag_nf_checkout" type="host">https://cdn-checkout-qe2.nofraud-test.com</value>
+                <value id="nf_checkout" type="host">*.nofraud-test.com</value>
+                <value id="prod_nf_checkout" type="host">*.nofraud.com</value>
             </values>
         </policy>
         <policy id="frame-src">
             <values>
-                <value id="stag_nf_checkout" type="host">https://cdn-checkout-qe2.nofraud-test.com</value>
+                <value id="nf_checkout" type="host">*.nofraud-test.com</value>
+                <value id="prod_nf_checkout" type="host">*.nofraud.com</value>            
             </values>
         </policy>
-        <policy id="script-src">
+        <policy id="img-src">
             <values>
-                <value id="dev_nf_checkout" type="host">https://dynamic-checkout-test.nofraud-test.com</value>
-            </values>
-        </policy>
-        <policy id="frame-src">
-            <values>
-                <value id="dev_nf_checkout" type="host">https://dynamic-checkout-test.nofraud-test.com</value>
-            </values>
-        </policy>
-        <policy id="script-src">
-            <values>
-                <value id="prod_nf_checkout" type="host">https://cdn-checkout.nofraud.com</value>
-            </values>
-        </policy>
-        <policy id="frame-src">
-            <values>
-                <value id="prod_nf_checkout" type="host">https://cdn-checkout.nofraud.com</value>
+                <value id="nf_checkout" type="host">*.nofraud-test.com</value>
+                <value id="prod_nf_checkout" type="host">*.nofraud.com</value>
             </values>
         </policy>
     </policies>
