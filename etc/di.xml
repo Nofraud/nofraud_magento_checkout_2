@@ -13,4 +13,8 @@
         <plugin name="NF_gift_card_plugin" type="NoFraud\Checkout\Plugin\GiftCardPlugin" sortOrder="10" />
     </type>
 	<preference for="NoFraud\Checkout\Api\CurrencyInformationInterface" type="NoFraud\Checkout\Model\CurrencyInformation"/>
+	<!-- <type name="Magento\Checkout\Block\Checkout\AttributeMerger">
+        <plugin name="nf_checkout_phone_number_Validator" type="NoFraud\Checkout\Plugin\Block\Checkout\PhonePlugin" sortOrder="10"/>
+    </type> -->
+	<preference for="NoFraud\Checkout\Api\PhonenumberInterface" type="NoFraud\Checkout\Model\PhonenumberData" />
 </config>
