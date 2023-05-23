@@ -24,7 +24,7 @@
 			<resource ref="self"/>	
 		</resources>
 	</route>
-	<route url="/V1/nofraudcheckout/fetchstorecredit" method="GET">
+	<route url="/V1/nofraudcheckout/fetchstorecredit" method="POST">
         <service class="NoFraud\Checkout\Api\StoreCreditInterface" method="getstoreCreditByCustomerId"/>
         <resources>
             <resource ref="self"/>
@@ -54,10 +54,22 @@
 			<resource ref="self" />
 		</resources>
 	</route>
-	<route url="/V1/nofraudcheckout/currency/:currencyCode" method="GET">
+	<route url="/V1/nofraudcheckout/currency/:currencyCode" method="POST">
 		<service class="NoFraud\Checkout\Api\CurrencyInformationInterface" method="getCurrencyInformation" />
 		<resources>
 			 <resource ref="self" />
+		</resources>
+	</route>
+	<route url="/V1/nofraudcheckout/fetchphonenumbermode" method="POST">
+		<service class="NoFraud\Checkout\Api\PhonenumberInterface" method="getPhonenumberMode"/>
+		<resources>
+			<resource ref="self"/>
+		</resources>
+	</route>
+	<route url="/V1/nofraudcheckout/setphonenumbermode" method="POST">
+		<service class="NoFraud\Checkout\Api\PhonenumberInterface" method="setPhonenumberMode"/>
+		<resources>
+			<resource ref="self"/>
 		</resources>
 	</route>
 </routes>
