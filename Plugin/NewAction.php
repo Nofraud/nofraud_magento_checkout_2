@@ -50,6 +50,9 @@ class NewAction
 
     public function beforeExecute(\Magento\Sales\Controller\Adminhtml\Order\Invoice\NewAction $subject)
     {
+        if(!$this->checkoutHelper->getEnabled()){
+            return;
+        }
         $merchantPreferences = $this->getNofraudSettings();
         $manualCapture       = $merchantPreferences['settings']['manualCapture']['isEnabled'] ?? false;
         error_log(print_r($merchantPreferences['settings']['manualCapture'],true),3,BP."/var/log/new_action.log");
