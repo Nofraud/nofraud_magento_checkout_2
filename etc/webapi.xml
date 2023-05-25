@@ -54,7 +54,7 @@
 			<resource ref="self" />
 		</resources>
 	</route>
-	<route url="/V1/nofraudcheckout/currency/:currencyCode" method="POST">
+	<route url="/V1/nofraudcheckout/currency/:currencyCode" method="GET">
 		<service class="NoFraud\Checkout\Api\CurrencyInformationInterface" method="getCurrencyInformation" />
 		<resources>
 			 <resource ref="self" />
