@@ -50,10 +50,13 @@ class Save
 
     public function beforeExecute(\Magento\Sales\Controller\Adminhtml\Order\Invoice\Save $subject)
     {
+        if(!$this->checkoutHelper->getEnabled()){
+            return;
+        }
         $merchantPreferences = $this->getNofraudSettings();
         $manualCapture       = $merchantPreferences['settings']['manualCapture']['isEnabled'] ?? false;
         error_log(print_r($merchantPreferences['settings']['manualCapture'],true),3,BP."/var/log/save_action.log");
-        if (!empty($manualCapture) && $manualCapture === true) {
+        //if (!empty($manualCapture) && $manualCapture === true) {
             $orderId = $subject->getRequest()->getParam('order_id');
             try {
                 $order          = $this->orderRepository->get($orderId);
@@ -80,7 +83,7 @@ class Save
                 exit;
             }
             return null;
-        }
+        //}
     }
 
     /**
@@ -201,4 +204,3 @@ class Save
         }
     }
 }
-?>
