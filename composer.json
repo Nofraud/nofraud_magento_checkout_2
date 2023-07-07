@@ -2,7 +2,7 @@
     "name": "nofraud/checkout",
     "description": "NoFraud Checkout",
     "require": {
-        "php": "~5.5.0|~5.6.0|~7.0.0|8.1"
+        "php": ">=7.4.0 <=8.2.99"
     },
 	"type": "magento2-module",
     "license": [
