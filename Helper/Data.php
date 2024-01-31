@@ -18,14 +18,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
     * Checkout BASE URLS
     **/
     const PROD_CHECKOUT_API_BASE_URL = "https://dynamic-api-checkout.nofraud.com";
-    const STAG_CHECKOUT_API_BASE_URL = "https://dynamic-api-checkout-qe2.nofraud-test.com";
+    const STAG_CHECKOUT_API_BASE_URL = "https://checkout-api-qe1.nofraud-test.com";
+    // const STAG_CHECKOUT_API_BASE_URL = "https://dynamic-api-checkout-qe2.nofraud-test.com";
     const DEV_CHECKOUT_API_BASE_URL  = "https://dynamic-checkout-api-staging2.nofraud-test.com";
     
     /* 
     * Checkout JS URLS 
     **/
     const PROD_API_SOURCE_JS = "https://cdn-checkout.nofraud.com/scripts/nf-src-magento.js";
-    const STAG_API_SOURCE_JS = "https://cdn-checkout-qe2.nofraud-test.com/scripts/nf-src-magento.js";
+    // const STAG_API_SOURCE_JS = "https://cdn-checkout-qe2.nofraud-test.com/scripts/nf-src-magento.js";
+    const STAG_API_SOURCE_JS = "https://cdn-checkout-qe1.nofraud-test.com/scripts/nf-src-magento.js";
     const DEV_API_SOURCE_JS  = "https://dynamic-checkout-test.nofraud-test.com/latest/scripts/nf-src-magento.js";
 
     /** 
