@@ -38,19 +38,33 @@ class CurrencyInformation implements CurrencyInformationInterface
 
     public function getCurrencyInformation($currencyCode)
     {
+        $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/currencyInformation.log');
+        $logger = new \Zend_Log();
+        $logger->addWriter($writer);
+        $logger->info('currencyInformation Start');
+
         try {
             $currency = $this->currencyFactory->create()->load($currencyCode);
+            
 
-            $symbolPositionNums  = (array)$this->currency->getCurrency($currencyCode);
-            foreach ($symbolPositionNums as $symbolPositionNum) {
-                if ($symbolPositionNum['position'] == self::STANDARD) {
-                    $symbolPosition = 'STANDARD';
-                } elseif ($symbolPositionNum['position'] == self::RIGHT) {
-                    $symbolPosition = 'RIGHT';
-                } elseif ($symbolPositionNum['position'] == self::LEFT) {
-                    $symbolPosition = 'LEFT';
-                }
+            $currencyResponse = $this->currency->getCurrency($currencyCode);
+
+            $logger->info('currencyResponse - ' . json_encode($currencyResponse));
+
+            $symbolPositionNum  = ((array)$currencyResponse)[chr(0) . '*' . chr(0) . 'options'];
+
+            $logger->info('currencyResponse - Cast - ' . json_encode($symbolPositionNum));
+
+            if ($symbolPositionNum['position'] == self::STANDARD) {
+                $symbolPosition = 'STANDARD';
+            } elseif ($symbolPositionNum['position'] == self::RIGHT) {
+                $symbolPosition = 'RIGHT';
+            } elseif ($symbolPositionNum['position'] == self::LEFT) {
+                $symbolPosition = 'LEFT';
             }
+
+            $logger->info('symbolPosition - ' . json_encode($symbolPosition));
+
             $priceFormeter = $this->priceHelper->currency(self::REDIXPRICEDATA);
             $radix =  strip_tags($priceFormeter);
             $radixseparator = substr($radix, 6, 1);
