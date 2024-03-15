@@ -12,10 +12,16 @@
 			<resource ref="Magento_Sales::sales" />
 		</resources>
 	</route>
+	<route url="/V1/nofraudcheckout/:cartId/remove-addresses" method="POST">
+		<service class="NoFraud\Checkout\Api\CartManagementInterface" method="removeAddresses" />
+		<resources>
+			<resource ref="self"/>
+		</resources>
+	</route>
 	<route url="/V1/nofraudcheckout/initialize" method="POST">
 		<service class="NoFraud\Checkout\Api\SetConfiguration" method="enableConfiguration" />
 		<resources>
-			<resource ref="NoFraud_Checkout::config"/>	
+			<resource ref="NoFraud_Checkout::config"/>
 		</resources>
 	</route>
 	<route url="/V1/nofraudcheckout/validate" method="POST">
